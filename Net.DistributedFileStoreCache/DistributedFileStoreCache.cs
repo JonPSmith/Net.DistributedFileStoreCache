@@ -67,7 +67,7 @@ public class DistributedFileStoreCache : IDistributedCache, IDistributedFileStor
     /// <param name="key">A string identifying the requested value.</param>
     public void Refresh(string key)
     {
-        //not used
+        _stringCache.Refresh(key);
     }
 
     /// <summary>
@@ -75,11 +75,9 @@ public class DistributedFileStoreCache : IDistributedCache, IDistributedFileStor
     /// </summary>
     /// <param name="key">A string identifying the requested value.</param>
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
-    /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
     public Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
     {
-        //not used
-        return Task.CompletedTask;
+        return _stringCache.RefreshAsync(key);
     }
 
     /// <summary>Removes the value with the given key.</summary>

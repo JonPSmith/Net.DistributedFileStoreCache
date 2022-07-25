@@ -14,20 +14,19 @@ internal static class StaticCachePart
 {
     /// <summary>
     /// If this is true, then the cache file must be read in into the 
-    /// <see cref="ReadCacheKeyValues"/> static dictionary
+    /// <see cref="CacheContent"/> static dictionary
     /// </summary>
     public static bool LocalCacheIsOutOfDate { get; private set; }
 
     /// <summary>
-    /// This contains the keys/values in this distributed cache.
-    /// This is read-only and it is updated by reading the cache file 
+    /// This contains the local static cache of the data in the cache file 
     /// </summary>
-    public static IReadOnlyDictionary<string, string>? ReadCacheKeyValues => _cacheKeyValues;
+    public static CacheJsonContent CacheContent { get; private set; } = new CacheJsonContent();
 
     //private values
-    private static Dictionary<string, string>? _cacheKeyValues = new ();
     private static FileSystemWatcher? _watcher;
     private static string? _cacheFilePathCheck;
+
 
     /// <summary>
     /// This should be called on startup after the <see cref="DistributedFileStoreCacheOptions"/> has been set.
@@ -63,12 +62,12 @@ internal static class StaticCachePart
     }
 
     /// <summary>
-    /// This updates the in-memory version of the cache and sets the <see cref="LocalCacheIsOutOfDate"/> to false
+    /// This updates the local static cache parameter and sets the <see cref="LocalCacheIsOutOfDate"/> to false
     /// </summary>
     /// <param name="updatedCache"></param>
-    public static void UpdateInMemoryCache(Dictionary<string, string> updatedCache)
+    public static void UpdateLocalCache(CacheJsonContent updatedCache)
     {
-        _cacheKeyValues = updatedCache;
+        CacheContent = updatedCache;
         LocalCacheIsOutOfDate = false;
     }
 }

@@ -1,9 +1,10 @@
 {
   "Cache": {
-    "Key1": "Diff = 0.967 ms",
-    "Key4": "Diff = 1.189 ms",
-    "Key3": "Diff = 1.101 ms",
-    "Key2": "Diff = 1.016 ms",
-    "Key5": "Diff = 1.209 ms"
-  }
+    "Key1": "Diff = 1.121 ms",
+    "Key2": "Diff = 1.506 ms",
+    "Key3": "Diff = 1.523 ms",
+    "Key4": "Diff = 1.645 ms",
+    "Key5": "Diff = 1.465 ms"
+  },
+  "CacheOptions": {}
 }

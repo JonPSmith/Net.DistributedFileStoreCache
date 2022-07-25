@@ -1,8 +1,10 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
+using Net.DistributedFileStoreCache.SupportCode;
 using Test.TestHelpers;
 using TestSupport.Helpers;
 using Xunit;
@@ -24,7 +26,6 @@ public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
         _output = output;
 
         var services = new ServiceCollection();
-        var environment = new StubEnvironment(GetType().Name, TestData.GetTestDataDir());
         services.AddDistributedFileStoreCache(options =>
         {
             options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
@@ -67,6 +68,132 @@ public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
         var allValues = _distributedCache.GetAllKeyValues();
         allValues.Count.ShouldEqual(1);
         allValues["test"].ShouldEqual("goodbye");
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSet_AbsoluteExpirationStillValid()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        _distributedCache.Set("test-timeout1Sec", "time1", new DistributedCacheEntryOptions{ AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(1)});
+
+        //VERIFY
+        _distributedCache.Get("test-timeout1Sec").ShouldEqual("time1");
+        StaticCachePart.CacheContent.CacheOptions["test-timeout1Sec"].ShouldNotBeNull();
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSet_AbsoluteExpirationExpired()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        _distributedCache.Set("test-timeoutExpired", "time1", new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromTicks(1) });
+
+        //VERIFY
+        _distributedCache.Get("test-timeoutExpired").ShouldBeNull();
+        StaticCachePart.CacheContent.CacheOptions.ContainsKey("test-timeout1Sec").ShouldBeFalse();
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSet_SlidingExpirationStillValid()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        _distributedCache.Set("test-timeout1Sec", "time1", new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromSeconds(1) });
+
+        //VERIFY
+        _distributedCache.Get("test-timeout1Sec").ShouldEqual("time1");
+        StaticCachePart.CacheContent.CacheOptions["test-timeout1Sec"].ShouldNotBeNull();
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSet_SlidingExpirationExpired()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        _distributedCache.Set("test-timeoutExpired", "time1", new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromTicks(1) });
+
+        //VERIFY
+        _distributedCache.Get("test-timeoutExpired").ShouldBeNull();
+        StaticCachePart.CacheContent.CacheOptions.ContainsKey("test-timeout1Sec").ShouldBeFalse();
+
+        _options.DisplayCacheFile(_output);
+    }
+
+
+    [Fact]
+    public void DistributedFileStoreCacheSet_SlidingExpirationGetRefresh_LocalOnly()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        _distributedCache.Set("test-GetRefresh", "time1", new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromMilliseconds(100) });
+        Thread.Sleep(60);
+        _distributedCache.Get("test-GetRefresh").ShouldEqual("time1");
+        Thread.Sleep(60);
+
+        //VERIFY
+        _distributedCache.Get("test-GetRefresh").ShouldEqual("time1");
+        StaticCachePart.CacheContent.CacheOptions.ContainsKey("test-GetRefresh").ShouldBeTrue();
+
+        var cacheFileJson = _options.GetCacheFileContentAsJson();
+        //this checks that the cache file HASN'T been updated
+        StaticCachePart.CacheContent.CacheOptions["test-GetRefresh"].TimeOutTimeUtc
+            .ShouldNotEqual(cacheFileJson.CacheOptions["test-GetRefresh"].TimeOutTimeUtc);
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSet_SlidingExpirationGetRefresh_UpdateCacheFile()
+    {
+        //SETUP
+        var services = new ServiceCollection();
+        services.AddDistributedFileStoreCache(options =>
+        {
+            options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
+            options.PathToCacheFileDirectory = TestData.GetTestDataDir();
+            options.SecondPartOfCacheFileName = GetType().Name;
+            options.TurnOffStaticFilePathCheck = true;
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            options.GetKeyUpdatedSlidingExpirationAcrossAllInstances = true;
+        });
+        var serviceProvider = services.BuildServiceProvider(); ;
+        var distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
+
+        distributedCache.ClearAll();
+
+        //ATTEMPT
+        distributedCache.Set("test-GetRefresh", "time1", new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromMilliseconds(100) });
+        Thread.Sleep(60);
+        distributedCache.Get("test-GetRefresh").ShouldEqual("time1");
+        Thread.Sleep(60);
+
+        //VERIFY
+        distributedCache.Get("test-GetRefresh").ShouldEqual("time1");
+        StaticCachePart.CacheContent.CacheOptions.ContainsKey("test-GetRefresh").ShouldBeTrue();
+
+        var cacheFileJson = _options.GetCacheFileContentAsJson();
+        //this checks that the cache file HAS been updated
+        StaticCachePart.CacheContent.CacheOptions["test-GetRefresh"].TimeOutTimeUtc
+            .ShouldEqual(cacheFileJson.CacheOptions["test-GetRefresh"].TimeOutTimeUtc);
 
         _options.DisplayCacheFile(_output);
     }
@@ -124,6 +251,7 @@ public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
         _distributedCache.Remove("XXX");
 
         //VERIFY
+        var allValues = _distributedCache.GetAllKeyValues();
         _distributedCache.Get("XXX").ShouldBeNull();
         _distributedCache.Get("Still there").ShouldEqual("keep this");
         _distributedCache.GetAllKeyValues().Count.ShouldEqual(1);

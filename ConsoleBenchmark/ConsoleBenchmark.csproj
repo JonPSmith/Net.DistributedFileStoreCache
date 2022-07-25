@@ -14,7 +14,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Net.DistributedFileStoreCache\Net.DistributedFileStoreCache.csproj" />
-		<ProjectReference Include="..\Test\Test.csproj" />
 	</ItemGroup>
 
 </Project>

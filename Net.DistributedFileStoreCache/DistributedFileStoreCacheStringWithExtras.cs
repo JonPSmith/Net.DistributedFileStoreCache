@@ -39,7 +39,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <param name="options">The cache options for the value.</param>
     public void Set(string key, string value, DistributedCacheEntryOptions? options)
     {
-        _cacheFileHandler.AddKeyValueToCacheFile(key, value);
+        _cacheFileHandler.SetKeyValue(key, value, options);
     }
 
     /// <summary>Sets the value with the given key.</summary>
@@ -51,7 +51,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     public Task SetAsync(string key, string value, DistributedCacheEntryOptions? options,
         CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.AddKeyValueToCacheFileAsync(key, value);
+        return _cacheFileHandler.SetKeyValueAsync(key, value, options);
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <param name="key">A string identifying the requested value.</param>
     public void Refresh(string key)
     {
-        _cacheFileHandler.RefreshCacheFile();
+        _cacheFileHandler.RefreshKeyValue(key);
     }
 
     /// <summary>
@@ -68,17 +68,16 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// </summary>
     /// <param name="key">A string identifying the requested value.</param>
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
-    /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
     public Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.RefreshCacheFileAsync();
+        return _cacheFileHandler.RefreshKeyValueAsync(key);
     }
 
     /// <summary>Removes the value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     public void Remove(string key)
     {
-        _cacheFileHandler.RemoveKeyValueToCacheFile(key);
+        _cacheFileHandler.RemoveKeyValue(key);
     }
 
     /// <summary>Removes the value with the given key.</summary>
@@ -87,7 +86,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
     public Task RemoveAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.RemoveKeyValueToCacheFileAsync(key);
+        return _cacheFileHandler.RemoveKeyValueAsync(key);
     }
 
     /// <summary>

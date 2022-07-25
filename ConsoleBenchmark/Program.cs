@@ -3,7 +3,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
-using Test.TestHelpers;
 using TestSupport.Helpers;
 
 public class ConsoleBenchmark
@@ -13,13 +12,13 @@ public class ConsoleBenchmark
     public ConsoleBenchmark()
     {
         var services = new ServiceCollection();
-        var environment = new StubEnvironment(GetType().Name, TestData.GetCallingAssemblyTopLevelDir());
         services.AddDistributedFileStoreCache(options =>
         {
             options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
-            options.TurnOffStaticFilePathCheck = true;
+            options.PathToCacheFileDirectory = TestData.GetCallingAssemblyTopLevelDir();
+            options.SecondPartOfCacheFileName = GetType().Name;
             options.MaxBytesInJsonCacheFile = 50 * 1000;
-        }, environment);
+        });
         var serviceProvider = services.BuildServiceProvider();
 
         _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();

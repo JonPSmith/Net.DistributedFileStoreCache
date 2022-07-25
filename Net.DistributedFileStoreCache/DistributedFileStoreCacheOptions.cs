@@ -66,6 +66,20 @@ public class DistributedFileStoreCacheOptions
     public string? PathToCacheFileDirectory { get; set; }
 
     /// <summary>
+    /// By default, getting a key/value with a SlidingExpiration (see <see cref="DistributedCacheEntryOptions"/> will only update
+    /// the cache file when another set/remove. However the local cache store will have the SlidingExpiration updated.
+    /// This is done to improve performance because every access of a key/value with a SlidingExpiration would create a write to the cache file.
+    /// If you want to update the SlidingExpiration on a get to update the cache file, then this to true.
+    /// </summary>
+    public bool GetKeyUpdatedSlidingExpirationAcrossAllInstances { get; set; } = false;
+
+    /// <summary>
+    /// By default the json inside the cache file is one long string, which is efficient on space but hard to read.
+    /// If you set this to true, then the json inside the cache file will be formatted, which is not efficient on space but easy to read.
+    /// </summary>
+    public bool IndentJsonInCacheFile { get; set; } = false;
+
+    /// <summary>
     /// This sets the delay between a retry after a <see cref="UnauthorizedAccessException"/> is throw
     /// NOTE: Keep it small 
     /// </summary>

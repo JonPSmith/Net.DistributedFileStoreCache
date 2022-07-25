@@ -2,6 +2,7 @@
 // Licensed under MIT license. See License.txt in the project root for license information.
 
 using System.Text;
+using Microsoft.Extensions.Caching.Distributed;
 using Net.DistributedFileStoreCache;
 using Net.DistributedFileStoreCache.SupportCode;
 using Test.TestHelpers;
@@ -27,6 +28,7 @@ public class TestStaticCachePart
         {
             PathToCacheFileDirectory = TestData.GetTestDataDir(),
             SecondPartOfCacheFileName = GetType().Name,
+            IndentJsonInCacheFile = true,
             TurnOffStaticFilePathCheck = true
         };
     }
@@ -87,7 +89,8 @@ public class TestStaticCachePart
 
         //VERIFY
         File.Exists(_options.FormCacheFilePath()).ShouldBeTrue();
-        StaticCachePart.ReadCacheKeyValues.ShouldEqual(new Dictionary<string, string>());
+        StaticCachePart.CacheContent.Cache.ShouldEqual(new Dictionary<string, string>());
+        StaticCachePart.CacheContent.CacheOptions.ShouldEqual(new Dictionary<string, CacheEntryOptions>());
         _options.DisplayCacheFile(_output);
     }
 

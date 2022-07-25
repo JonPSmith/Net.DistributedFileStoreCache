@@ -1,3 +1,11 @@
 {
-  "Cache": {}
+  "Cache": {
+    "test-GetRefresh": "time1"
+  },
+  "CacheOptions": {
+    "test-GetRefresh": {
+      "TimeOutTimeUtc": 637943589744567717,
+      "SlidingExpiration": "00:00:00.1000000"
+    }
+  }
 }

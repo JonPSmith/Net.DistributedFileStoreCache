@@ -47,9 +47,8 @@ public class TestMaxBytes
         cache.ClearAll();
 
         //ATTEMPT
-        cache.Set("Test", "123456789012345678901234567890", null);
         var ex = Assert.Throws<DistributedFileStoreCacheException>(
-            () => cache.Set("Test", "1111111111111111111111111111111", null));
+            () => cache.Set("Test", "123456789012345678901234567890", null));
 
         //VERIFY
         ex.Message.ShouldStartWith("Your cache json file has more that 20 bytes");
