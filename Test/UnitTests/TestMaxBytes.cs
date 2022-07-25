@@ -4,7 +4,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
 using Net.DistributedFileStoreCache.SupportCode;
-using Test.TestHelpers;
 using TestSupport.Helpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -26,11 +25,13 @@ public class TestMaxBytes
     private IDistributedFileStoreCacheStringWithExtras SetupCache(int maxBytes)
     {
         var services = new ServiceCollection();
-        var environment = new StubEnvironment(GetType().Name, TestData.GetTestDataDir());
-        services.AddDistributedFileStoreCache(environment, options =>
+        services.AddDistributedFileStoreCache(options =>
         {
             options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
+            options.PathToCacheFileDirectory = TestData.GetTestDataDir();
+            options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;
+
             options.MaxBytesInJsonCacheFile = maxBytes;
         });
         var serviceProvider = services.BuildServiceProvider();
@@ -53,7 +54,4 @@ public class TestMaxBytes
         //VERIFY
         ex.Message.ShouldStartWith("Your cache json file has more that 20 bytes");
     }
-
-
-
 }

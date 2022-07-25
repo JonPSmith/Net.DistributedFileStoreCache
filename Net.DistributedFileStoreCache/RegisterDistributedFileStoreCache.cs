@@ -11,15 +11,25 @@ namespace Net.DistributedFileStoreCache;
 public static class RegisterDistributedFileStoreCache
 {
     public static IServiceCollection AddDistributedFileStoreCache(this IServiceCollection services,
-        IHostEnvironment environment,
-        Action<DistributedFileStoreCacheOptions>? optionsAction = null)
+        Action<DistributedFileStoreCacheOptions>? optionsAction = null,
+        IHostEnvironment? environment = null)
     {
         if (services == null) throw new ArgumentNullException(nameof(services));
 
         var options = new DistributedFileStoreCacheOptions();
         optionsAction?.Invoke(options);
-        options.SecondPartOfCacheFileName ??= environment.EnvironmentName;
-        options.PathToCacheFileDirectory ??= environment.ContentRootPath;
+        options.PathToCacheFileDirectory ??= environment?.ContentRootPath;
+        options.SecondPartOfCacheFileName ??= environment?.EnvironmentName;
+
+        if (options.PathToCacheFileDirectory == null)
+            throw new DistributedFileStoreCacheException(
+                $"You either need to provide an value for the {nameof(environment)} parameter, " +
+                $"or set the options' {nameof(DistributedFileStoreCacheOptions.PathToCacheFileDirectory)} property.");
+
+        if (options.SecondPartOfCacheFileName == null)
+            throw new DistributedFileStoreCacheException(
+                $"You either need to provide an value for the {nameof(environment)} parameter, " +
+                $"or set the options' {nameof(DistributedFileStoreCacheOptions.SecondPartOfCacheFileName)} property.");
 
         //Set up the static file watcher
         StaticCachePart.SetupStaticCache(options);

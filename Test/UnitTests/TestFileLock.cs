@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
-using System;
-using System.IO;
 using System.Text;
 using Net.DistributedFileStoreCache;
 using Net.DistributedFileStoreCache.SupportCode;
@@ -16,8 +14,8 @@ namespace Test.UnitTests;
 
 public class TestFileLock
 {
-    private readonly ITestOutputHelper _output;
     private readonly string _jsonFilePath;
+    private readonly ITestOutputHelper _output;
 
     /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
     public TestFileLock(ITestOutputHelper output)
@@ -176,5 +174,4 @@ public class TestFileLock
         hasChanged.ShouldEqual(true);
         newName.ShouldEqual("testlock.2.json");
     }
-
 }

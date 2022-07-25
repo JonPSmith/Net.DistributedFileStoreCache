@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
-using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
 using Test.TestHelpers;
@@ -17,9 +15,9 @@ namespace Test.UnitTests;
 [Collection("Sequential")]
 public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
 {
-    private readonly ITestOutputHelper _output;
     private readonly IDistributedFileStoreCacheStringWithExtras _distributedCache;
     private readonly DistributedFileStoreCacheOptions _options;
+    private readonly ITestOutputHelper _output;
 
     public TestDistributedFileStoreCacheStringWithExtras(ITestOutputHelper output)
     {
@@ -27,9 +25,11 @@ public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
 
         var services = new ServiceCollection();
         var environment = new StubEnvironment(GetType().Name, TestData.GetTestDataDir());
-        services.AddDistributedFileStoreCache(environment, options =>
+        services.AddDistributedFileStoreCache(options =>
         {
             options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
+            options.PathToCacheFileDirectory = TestData.GetTestDataDir();
+            options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;
         });
         var serviceProvider = services.BuildServiceProvider();
@@ -170,6 +170,4 @@ public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
 
         _options.DisplayCacheFile(_output);
     }
-
-
 }

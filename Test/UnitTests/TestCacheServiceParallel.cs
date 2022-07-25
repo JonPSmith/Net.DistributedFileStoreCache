@@ -1,9 +1,6 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
 using Test.TestHelpers;
@@ -30,10 +27,11 @@ public class TestCacheServiceParallel
     private IDistributedFileStoreCacheStringWithExtras SetupDistributedFileStoreCache()
     {
         var services = new ServiceCollection();
-        var environment = new StubEnvironment(GetType().Name, TestData.GetTestDataDir());
-        services.AddDistributedFileStoreCache(environment, options =>
+        services.AddDistributedFileStoreCache(options =>
         {
             options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
+            options.PathToCacheFileDirectory = TestData.GetTestDataDir();
+            options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;
         });
         var serviceProvider = services.BuildServiceProvider();

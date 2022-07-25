@@ -14,12 +14,12 @@ public class ConsoleBenchmark
     {
         var services = new ServiceCollection();
         var environment = new StubEnvironment(GetType().Name, TestData.GetCallingAssemblyTopLevelDir());
-        services.AddDistributedFileStoreCache(environment, options =>
+        services.AddDistributedFileStoreCache(options =>
         {
             options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
             options.TurnOffStaticFilePathCheck = true;
             options.MaxBytesInJsonCacheFile = 50 * 1000;
-        });
+        }, environment);
         var serviceProvider = services.BuildServiceProvider();
 
         _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();

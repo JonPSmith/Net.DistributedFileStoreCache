@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Net.DistributedFileStoreCache;
 using Net.DistributedFileStoreCache.SupportCode;
@@ -18,8 +16,8 @@ namespace Test.UnitTests;
 [Collection("Sequential")]
 public class TestStaticCachePart
 {
-    private readonly ITestOutputHelper _output;
     private readonly DistributedFileStoreCacheOptions _options;
+    private readonly ITestOutputHelper _output;
 
     public TestStaticCachePart(ITestOutputHelper output)
     {
@@ -120,7 +118,4 @@ public class TestStaticCachePart
         _options.DisplayCacheFile(_output);
         StaticCachePart.LocalCacheIsOutOfDate.ShouldEqual(true);
     }
-
-
-
 }
