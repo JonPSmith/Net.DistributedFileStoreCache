@@ -21,47 +21,15 @@ internal class CacheFileHandler
         if (StaticCachePart.LocalCacheIsOutOfDate)
             _options.TryAgainOnUnauthorizedAccess(UpdateLocalCacheFromCacheFile);
 
-        if (StaticCachePart.CacheContent.Cache.TryGetValue(key, out string? value))
-        {
-            if (StaticCachePart.CacheContent.CacheOptions.TryGetValue(key, out CacheEntryOptions? entryOptions))
-            {
-                if (entryOptions.RefreshSlidingExpirationIfThere())
-                {
-                    if (_options.GetKeyUpdatedSlidingExpirationAcrossAllInstances)
-                        _options.TryAgainOnUnauthorizedAccess(() =>
-                            ReadAndChangeCacheJsonFile(CacheChanges.Refresh, false, key, value)
-                                .CheckSyncValueTaskWorked());
-                }
-                if (entryOptions.HasExpired())
-                    return null;
-            }
-
-            return value;
-        }
-
-        return null;
+        return StaticCachePart.CacheContent.ReturnNullIfExpires(key);
     }
 
-    public async Task<string?> GetValueAsync(string key)
+    public async Task<string?> GetValueAsync(string key, CancellationToken token)
     {
         if (StaticCachePart.LocalCacheIsOutOfDate)
-            await _options.TryAgainOnUnauthorizedAccessAsync(UpdateLocalCacheFromCacheFileAsync);
+            await _options.TryAgainOnUnauthorizedAccessAsync(() => UpdateLocalCacheFromCacheFileAsync(token));
 
-        if (StaticCachePart.CacheContent.Cache.TryGetValue(key, out string? value))
-        {
-            if (StaticCachePart.CacheContent.CacheOptions.TryGetValue(key, out CacheEntryOptions? entryOptions))
-            {
-                if (_options.GetKeyUpdatedSlidingExpirationAcrossAllInstances && entryOptions.RefreshSlidingExpirationIfThere())
-                    await _options.TryAgainOnUnauthorizedAccessAsync(async () =>
-                        await ReadAndChangeCacheJsonFile(CacheChanges.Refresh, true, key, value));
-                if (entryOptions.HasExpired())
-                    return null;
-            }
-
-            return value;
-        }
-
-        return null;
+        return StaticCachePart.CacheContent.ReturnNullIfExpires(key);
     }
 
     public IReadOnlyDictionary<string, string> GetAllValues()
@@ -69,15 +37,15 @@ internal class CacheFileHandler
         if (StaticCachePart.LocalCacheIsOutOfDate)
             _options.TryAgainOnUnauthorizedAccess(UpdateLocalCacheFromCacheFile);
 
-        return StaticCachePart.CacheContent.Cache!;
+        return StaticCachePart.CacheContent.ReturnNonExpiredCacheValues();
     }
 
-    public async Task<IReadOnlyDictionary<string, string>> GetAllValuesAsync()
+    public async Task<IReadOnlyDictionary<string, string>> GetAllValuesAsync(CancellationToken token)
     {
         if (StaticCachePart.LocalCacheIsOutOfDate)
-            await _options.TryAgainOnUnauthorizedAccessAsync(UpdateLocalCacheFromCacheFileAsync);
+            await _options.TryAgainOnUnauthorizedAccessAsync(() => UpdateLocalCacheFromCacheFileAsync(token));
 
-        return StaticCachePart.CacheContent.Cache!;
+        return StaticCachePart.CacheContent.ReturnNonExpiredCacheValues();
     }
 
     public void SetKeyValue(string key, string value, DistributedCacheEntryOptions? entryOptions)
@@ -87,10 +55,11 @@ internal class CacheFileHandler
                 .CheckSyncValueTaskWorked());
     }
 
-    public async Task SetKeyValueAsync(string key, string value, DistributedCacheEntryOptions? entryOptions)
+    public async Task SetKeyValueAsync(string key, string value, DistributedCacheEntryOptions? entryOptions,
+        CancellationToken token)
     {
         await _options.TryAgainOnUnauthorizedAccessAsync(async () =>
-            await ReadAndChangeCacheJsonFile(CacheChanges.Add, true, key, value, entryOptions));
+            await ReadAndChangeCacheJsonFile(CacheChanges.Add, true, key, value, entryOptions, token));
     }
 
     public void RemoveKeyValue(string key)
@@ -100,23 +69,10 @@ internal class CacheFileHandler
                 .CheckSyncValueTaskWorked());
     }
 
-    public async Task RefreshKeyValueAsync(string key)
-    {
-        await _options.TryAgainOnUnauthorizedAccessAsync( async () => 
-            await ReadAndChangeCacheJsonFile(CacheChanges.Refresh, false, key));
-    }
-
-    public void RefreshKeyValue(string key)
-    {
-        _options.TryAgainOnUnauthorizedAccess(() =>
-            ReadAndChangeCacheJsonFile(CacheChanges.Refresh, false, key)
-                .CheckSyncValueTaskWorked());
-    }
-
-    public async Task RemoveKeyValueAsync(string key)
+    public async Task RemoveKeyValueAsync(string key, CancellationToken token)
     {
         await _options.TryAgainOnUnauthorizedAccessAsync(async () =>
-            await ReadAndChangeCacheJsonFile(CacheChanges.Remove, false, key));
+            await ReadAndChangeCacheJsonFile(CacheChanges.Remove, false, key, token: token));
     }
 
     public void ResetCacheFile()
@@ -158,7 +114,6 @@ internal class CacheFileHandler
         var readBuffer = new byte[_options.MaxBytesInJsonCacheFile];
         var readFilePath = _options.FormCacheFilePath();
 
-
         //This uses FileShare.None to ensure multiple instances don't try to update the in-memory cache at the same time
         using FileStream readStream = new FileStream(readFilePath, FileMode.Open, FileAccess.Read, FileShare.None,
             bufferSize: 1, false);
@@ -171,10 +126,9 @@ internal class CacheFileHandler
 
             StaticCachePart.UpdateLocalCache(GetJsonFromByteBuffer(numBytesRead, ref readBuffer));
         }
-
     }
 
-    private async ValueTask UpdateLocalCacheFromCacheFileAsync()
+    private async ValueTask UpdateLocalCacheFromCacheFileAsync(CancellationToken token)
     {
         var readBuffer = new byte[_options.MaxBytesInJsonCacheFile];
         var readFilePath = _options.FormCacheFilePath();
@@ -182,7 +136,7 @@ internal class CacheFileHandler
         using FileStream readStream = new FileStream(readFilePath, FileMode.Open, FileAccess.Read, FileShare.None,
             bufferSize: 1, true);
         {
-            var numBytesRead = await readStream.ReadAsync(readBuffer);
+            var numBytesRead = await readStream.ReadAsync(readBuffer, token);
             if (numBytesRead >= _options.MaxBytesInJsonCacheFile)
                 throw new DistributedFileStoreCacheException(
                     $"Your cache json file has more that {_options.MaxBytesInJsonCacheFile} " +
@@ -192,10 +146,11 @@ internal class CacheFileHandler
         }
     }
 
-    private enum CacheChanges { Add, Remove, Refresh, Reset }
+    private enum CacheChanges { Add, Remove, Reset }
 
-    private async ValueTask ReadAndChangeCacheJsonFile(CacheChanges whatToDo, bool useAsync, 
-        string? key = null, string? value = null, DistributedCacheEntryOptions? entryOptions = null)
+    private async ValueTask ReadAndChangeCacheJsonFile(CacheChanges whatToDo, bool useAsync,
+        string? key = null, string? value = null, DistributedCacheEntryOptions? entryOptions = null,
+        CancellationToken token = new CancellationToken())
     {
         //thanks to https://stackoverflow.com/questions/15628902/lock-file-exclusively-then-delete-move-it for this approach
 
@@ -207,7 +162,7 @@ internal class CacheFileHandler
             if(whatToDo != CacheChanges.Reset)
             {
                 numBytesRead = useAsync 
-                    ? await fileStream.ReadAsync(readWriteBuffer)
+                    ? await fileStream.ReadAsync(readWriteBuffer, token)
                     : fileStream.Read(readWriteBuffer);
                 if (numBytesRead >= _options.MaxBytesInJsonCacheFile)
                     throw new DistributedFileStoreCacheException(
@@ -223,20 +178,13 @@ internal class CacheFileHandler
                     if (value == null) throw new NullReferenceException("The value cannot be null");
                     json = GetJsonFromByteBuffer(numBytesRead, ref readWriteBuffer);
                     json.Cache[key] = value;
-                    if (entryOptions != null)
-                        json.CacheOptions[key] = new CacheEntryOptions(entryOptions);
+                    json.SetupTimeoutIfOptions(key, entryOptions);
                     break;
                 case CacheChanges.Remove:
                     if (key == null) throw new NullReferenceException("The key cannot be null");
                     json = GetJsonFromByteBuffer(numBytesRead, ref readWriteBuffer);
                     json.Cache.Remove(key);
-                    json.CacheOptions.Remove(key);
-                    break;
-                case CacheChanges.Refresh:
-                    if (key == null) throw new NullReferenceException("The key cannot be null");
-                    json = GetJsonFromByteBuffer(numBytesRead, ref readWriteBuffer);
-                    if (json.CacheOptions.TryGetValue(key, out var currentEntryOptions))
-                        currentEntryOptions.RefreshSlidingExpirationIfThere();
+                    json.TimeOuts.Remove(key);
                     break;
                 case CacheChanges.Reset:
                     json = new CacheJsonContent();
@@ -245,14 +193,18 @@ internal class CacheFileHandler
                     throw new ArgumentOutOfRangeException(nameof(whatToDo), whatToDo, null);
             }
 
-           
+            //We immediately update the local cache because a change of the expiration data isn't always updated to the file
+            StaticCachePart.UpdateLocalCache(json);
+
             //thanks to https://stackoverflow.com/questions/15628902/lock-file-exclusively-then-delete-move-it
             fileStream.Seek(0, SeekOrigin.Begin);
             fileStream.SetLength(0);
             if (useAsync)
-                await fileStream.WriteAsync(FillByteBufferWithCacheJsonData(json));
+                await fileStream.WriteAsync(FillByteBufferWithCacheJsonData(json), token);
             else
                 fileStream.Write(FillByteBufferWithCacheJsonData(json));
+
+
         }
     }
 
@@ -263,13 +215,7 @@ internal class CacheFileHandler
         var jsonString = Encoding.UTF8.GetString(buffer, 0, numBytes);
 
         var cacheContent = JsonSerializer.Deserialize<CacheJsonContent>(jsonString)!;
-        //This removes any key/values that have expired
-        foreach (var key in cacheContent.CacheOptions.Keys.Where(key => cacheContent.CacheOptions[key].HasExpired()))
-        {
-            cacheContent.Cache.Remove(key);
-            cacheContent.CacheOptions.Remove(key);
-        }
-
+        cacheContent.RemoveExpiredCacheValues();
         return cacheContent;
     }
 

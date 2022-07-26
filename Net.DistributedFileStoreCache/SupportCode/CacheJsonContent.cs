@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
-using Microsoft.Extensions.Caching.Distributed;
-
 namespace Net.DistributedFileStoreCache.SupportCode;
 
 public class CacheJsonContent
@@ -11,6 +9,6 @@ public class CacheJsonContent
 
     public Dictionary<string,string> Cache { get; set; } = new Dictionary<string, string>();
 
-    public Dictionary<string, CacheEntryOptions> CacheOptions { get; set; } = new Dictionary<string, CacheEntryOptions>();
+    public Dictionary<string, long> TimeOuts { get; set; } = new Dictionary<string, long>();
 
 }

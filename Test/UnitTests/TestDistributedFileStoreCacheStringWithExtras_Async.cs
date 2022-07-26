@@ -1,8 +1,10 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
+using Net.DistributedFileStoreCache.SupportCode;
 using Test.TestHelpers;
 using TestSupport.Helpers;
 using Xunit;
@@ -55,6 +57,63 @@ public class TestDistributedFileStoreCacheStringWithExtras_Async
         allValues["test"].ShouldEqual("hello async");
 
         _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public async Task DistributedFileStoreCacheSet_AbsoluteExpirationStillValid()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        await _distributedCache.SetAsync("test-timeout1Sec", "time1", new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(1) });
+
+        //VERIFY
+        (await _distributedCache.GetAsync("test-timeout1Sec")).ShouldEqual("time1");
+        StaticCachePart.CacheContent.TimeOuts["test-timeout1Sec"].ShouldNotBeNull();
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public async Task DistributedFileStoreCacheSet_AbsoluteExpirationExpired()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        await _distributedCache.SetAsync("test-timeoutExpired", "time1", new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromTicks(1) });
+
+        //VERIFY
+        (await _distributedCache.GetAsync("test-timeoutExpired")).ShouldBeNull();
+        StaticCachePart.CacheContent.TimeOuts.ContainsKey("test-timeout1Sec").ShouldBeFalse();
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public async Task DistributedFileStoreCacheSet_SlidingExpiration()
+    {
+        //SETUP
+
+        //ATTEMPT
+        var ex = await Assert.ThrowsAsync<NotImplementedException>( async () => await _distributedCache.SetAsync("test-bad", "time1",
+            new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromTicks(1) }));
+
+        //VERIFY
+        ex.Message.ShouldEqual("This library doesn't support sliding expirations for performance reasons.");
+    }
+
+    [Fact]
+    public async Task DistributedFileStoreCacheSet_Refresh()
+    {
+        //SETUP
+
+        //ATTEMPT
+        var ex = await Assert.ThrowsAsync<NotImplementedException>(async () => await _distributedCache.RefreshAsync("test"));
+
+        //VERIFY
+        ex.Message.ShouldEqual("This library doesn't support sliding expirations for performance reasons.");
     }
 
     [Fact]

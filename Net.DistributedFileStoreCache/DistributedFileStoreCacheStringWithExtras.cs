@@ -30,7 +30,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation, containing the located value or null.</returns>
     public Task<string?> GetAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.GetValueAsync(key);
+        return _cacheFileHandler.GetValueAsync(key, token);
     }
 
     /// <summary>Sets a value with the given key.</summary>
@@ -51,7 +51,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     public Task SetAsync(string key, string value, DistributedCacheEntryOptions? options,
         CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.SetKeyValueAsync(key, value, options);
+        return _cacheFileHandler.SetKeyValueAsync(key, value, options, token);
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <param name="key">A string identifying the requested value.</param>
     public void Refresh(string key)
     {
-        _cacheFileHandler.RefreshKeyValue(key);
+        throw new NotImplementedException("This library doesn't support sliding expirations for performance reasons.");
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
     public Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.RefreshKeyValueAsync(key);
+        throw new NotImplementedException("This library doesn't support sliding expirations for performance reasons.");
     }
 
     /// <summary>Removes the value with the given key.</summary>
@@ -86,7 +86,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
     public Task RemoveAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.RemoveKeyValueAsync(key);
+        return _cacheFileHandler.RemoveKeyValueAsync(key, token);
     }
 
     /// <summary>
@@ -110,8 +110,8 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// This return all the cached values as a dictionary
     /// </summary>
     /// <returns></returns>
-    public Task<IReadOnlyDictionary<string, string>> GetAllKeyValuesAsync()
+    public Task<IReadOnlyDictionary<string, string>> GetAllKeyValuesAsync(CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.GetAllValuesAsync();
+        return _cacheFileHandler.GetAllValuesAsync(token);
     }
 }

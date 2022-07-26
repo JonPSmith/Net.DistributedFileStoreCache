@@ -57,7 +57,8 @@ public class TestStaticCachePart
         File.WriteAllText(_options.FormCacheFilePath(), "{\r\n  \"Cache\": {\r\n    \"test\": \"goodbye\"\r\n  }\r\n}");
 
         //VERIFY
-        count.ShouldEqual(2);
+        count.ShouldBeInRange(1, 2);
+        _output.WriteLine($"Triggered {count} times");
     }
 
     [Fact]
@@ -75,7 +76,8 @@ public class TestStaticCachePart
         CreateNewCacheFile(_options.FormCacheFilePath());
 
         //VERIFY
-        count.ShouldEqual(2);
+        count.ShouldBeInRange(1, 2);
+        _output.WriteLine($"Triggered {count} times");
     }
 
     [Fact]
@@ -90,7 +92,7 @@ public class TestStaticCachePart
         //VERIFY
         File.Exists(_options.FormCacheFilePath()).ShouldBeTrue();
         StaticCachePart.CacheContent.Cache.ShouldEqual(new Dictionary<string, string>());
-        StaticCachePart.CacheContent.CacheOptions.ShouldEqual(new Dictionary<string, CacheEntryOptions>());
+        StaticCachePart.CacheContent.TimeOuts.ShouldEqual(new Dictionary<string, long>());
         _options.DisplayCacheFile(_output);
     }
 

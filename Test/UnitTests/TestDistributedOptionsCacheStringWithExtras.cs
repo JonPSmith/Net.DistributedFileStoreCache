@@ -83,7 +83,7 @@ public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
 
         //VERIFY
         _distributedCache.Get("test-timeout1Sec").ShouldEqual("time1");
-        StaticCachePart.CacheContent.CacheOptions["test-timeout1Sec"].ShouldNotBeNull();
+        StaticCachePart.CacheContent.TimeOuts["test-timeout1Sec"].ShouldNotBeNull();
 
         _options.DisplayCacheFile(_output);
     }
@@ -99,103 +99,34 @@ public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
 
         //VERIFY
         _distributedCache.Get("test-timeoutExpired").ShouldBeNull();
-        StaticCachePart.CacheContent.CacheOptions.ContainsKey("test-timeout1Sec").ShouldBeFalse();
+        StaticCachePart.CacheContent.TimeOuts.ContainsKey("test-timeout1Sec").ShouldBeFalse();
 
         _options.DisplayCacheFile(_output);
     }
 
     [Fact]
-    public void DistributedFileStoreCacheSet_SlidingExpirationStillValid()
+    public void DistributedFileStoreCacheSet_SlidingExpiration()
     {
         //SETUP
-        _distributedCache.ClearAll();
 
         //ATTEMPT
-        _distributedCache.Set("test-timeout1Sec", "time1", new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromSeconds(1) });
+        var ex = Assert.Throws<NotImplementedException>(() => _distributedCache.Set("test-bad", "time1", 
+            new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromTicks(1) }));
 
         //VERIFY
-        _distributedCache.Get("test-timeout1Sec").ShouldEqual("time1");
-        StaticCachePart.CacheContent.CacheOptions["test-timeout1Sec"].ShouldNotBeNull();
-
-        _options.DisplayCacheFile(_output);
+        ex.Message.ShouldEqual("This library doesn't support sliding expirations for performance reasons.");
     }
 
     [Fact]
-    public void DistributedFileStoreCacheSet_SlidingExpirationExpired()
+    public void DistributedFileStoreCacheSet_Refresh()
     {
         //SETUP
-        _distributedCache.ClearAll();
 
         //ATTEMPT
-        _distributedCache.Set("test-timeoutExpired", "time1", new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromTicks(1) });
+        var ex = Assert.Throws<NotImplementedException>(() => _distributedCache.Refresh("test"));
 
         //VERIFY
-        _distributedCache.Get("test-timeoutExpired").ShouldBeNull();
-        StaticCachePart.CacheContent.CacheOptions.ContainsKey("test-timeout1Sec").ShouldBeFalse();
-
-        _options.DisplayCacheFile(_output);
-    }
-
-
-    [Fact]
-    public void DistributedFileStoreCacheSet_SlidingExpirationGetRefresh_LocalOnly()
-    {
-        //SETUP
-        _distributedCache.ClearAll();
-
-        //ATTEMPT
-        _distributedCache.Set("test-GetRefresh", "time1", new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromMilliseconds(100) });
-        Thread.Sleep(60);
-        _distributedCache.Get("test-GetRefresh").ShouldEqual("time1");
-        Thread.Sleep(60);
-
-        //VERIFY
-        _distributedCache.Get("test-GetRefresh").ShouldEqual("time1");
-        StaticCachePart.CacheContent.CacheOptions.ContainsKey("test-GetRefresh").ShouldBeTrue();
-
-        var cacheFileJson = _options.GetCacheFileContentAsJson();
-        //this checks that the cache file HASN'T been updated
-        StaticCachePart.CacheContent.CacheOptions["test-GetRefresh"].TimeOutTimeUtc
-            .ShouldNotEqual(cacheFileJson.CacheOptions["test-GetRefresh"].TimeOutTimeUtc);
-
-        _options.DisplayCacheFile(_output);
-    }
-
-    [Fact]
-    public void DistributedFileStoreCacheSet_SlidingExpirationGetRefresh_UpdateCacheFile()
-    {
-        //SETUP
-        var services = new ServiceCollection();
-        services.AddDistributedFileStoreCache(options =>
-        {
-            options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
-            options.PathToCacheFileDirectory = TestData.GetTestDataDir();
-            options.SecondPartOfCacheFileName = GetType().Name;
-            options.TurnOffStaticFilePathCheck = true;
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            options.GetKeyUpdatedSlidingExpirationAcrossAllInstances = true;
-        });
-        var serviceProvider = services.BuildServiceProvider(); ;
-        var distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
-
-        distributedCache.ClearAll();
-
-        //ATTEMPT
-        distributedCache.Set("test-GetRefresh", "time1", new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromMilliseconds(100) });
-        Thread.Sleep(60);
-        distributedCache.Get("test-GetRefresh").ShouldEqual("time1");
-        Thread.Sleep(60);
-
-        //VERIFY
-        distributedCache.Get("test-GetRefresh").ShouldEqual("time1");
-        StaticCachePart.CacheContent.CacheOptions.ContainsKey("test-GetRefresh").ShouldBeTrue();
-
-        var cacheFileJson = _options.GetCacheFileContentAsJson();
-        //this checks that the cache file HAS been updated
-        StaticCachePart.CacheContent.CacheOptions["test-GetRefresh"].TimeOutTimeUtc
-            .ShouldEqual(cacheFileJson.CacheOptions["test-GetRefresh"].TimeOutTimeUtc);
-
-        _options.DisplayCacheFile(_output);
+        ex.Message.ShouldEqual("This library doesn't support sliding expirations for performance reasons.");
     }
 
     [Fact]
