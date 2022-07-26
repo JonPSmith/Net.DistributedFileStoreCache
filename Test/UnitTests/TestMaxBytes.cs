@@ -1,9 +1,10 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
-using Net.DistributedFileStoreCache.SupportCode;
 using TestSupport.Helpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -39,18 +40,40 @@ public class TestMaxBytes
         return serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
     }
 
-    [Fact]
-    public void TestFailsOnMaxBytes()
+    [Theory]
+    [InlineData(100, 1)]
+    [InlineData(200, 2)]
+    public void TestFailsOnMaxBytes(int maxBytes, int numValues)
     {
         //SETUP
-        var cache = SetupCache(20);
+        var cache = SetupCache(maxBytes);
         cache.ClearAll();
 
         //ATTEMPT
-        var ex = Assert.Throws<DistributedFileStoreCacheException>(
-            () => cache.Set("Test", "123456789012345678901234567890", null));
+        cache.Set("Test1", "123456789012345678901234567890", null);
+        cache.Set("Test2", "123456789012345678901234567890", null);
 
         //VERIFY
-        ex.Message.ShouldStartWith("Your cache json file has more that 20 bytes");
+        cache.GetAllKeyValues().Count.ShouldEqual(numValues);
     }
+
+    [Fact]
+    public void TestJsonSerializerOptionsUnsafeRelaxedJsonEscaping()
+    {
+        var x = new Dictionary<string, short[]> {
+            {"Test1", new short[] { 1,2,3,40,60,255 }},
+            {"Test2", new short[] { 400, 32000 }}
+        };
+        var options = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+        var jsonString = JsonSerializer.Serialize(x, options);
+        _output.WriteLine(jsonString);
+
+        var result = JsonSerializer.Deserialize<Dictionary<string, short[]>>(jsonString);
+
+        result.ShouldEqual(x);
+    }
+
 }

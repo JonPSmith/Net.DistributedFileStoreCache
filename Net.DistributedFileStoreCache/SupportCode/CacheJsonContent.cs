@@ -10,5 +10,4 @@ public class CacheJsonContent
     public Dictionary<string,string> Cache { get; set; } = new Dictionary<string, string>();
 
     public Dictionary<string, long> TimeOuts { get; set; } = new Dictionary<string, long>();
-
 }

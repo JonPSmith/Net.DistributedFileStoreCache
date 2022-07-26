@@ -62,6 +62,13 @@ internal static class ExpirationExtensions
         return value;
     }
 
+    /// <summary>
+    /// Used to return cache values with any expired values removed.
+    /// We need this because we don't immediately update the cache file when a value expired.
+    /// This improves the performance as write are slow when compared to the read 
+    /// </summary>
+    /// <param name="cacheContent"></param>
+    /// <returns></returns>
     public static IReadOnlyDictionary<string, string> ReturnNonExpiredCacheValues(this CacheJsonContent cacheContent)
     {
         foreach (var key in cacheContent.TimeOuts.Keys.Where(key => cacheContent.TimeOuts[key].HasExpired()))
@@ -71,6 +78,10 @@ internal static class ExpirationExtensions
         return new ReadOnlyDictionary<string, string>(cacheContent.Cache);
     }
 
+    /// <summary>
+    /// This removes expired cache values before writing to the cache file.
+    /// </summary>
+    /// <param name="cacheContent"></param>
     public static void RemoveExpiredCacheValues(this CacheJsonContent cacheContent)
     {
         foreach (var key in cacheContent.TimeOuts.Keys.Where(key => cacheContent.TimeOuts[key].HasExpired()))

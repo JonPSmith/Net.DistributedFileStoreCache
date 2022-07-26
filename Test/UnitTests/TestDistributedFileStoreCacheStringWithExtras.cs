@@ -15,7 +15,7 @@ namespace Test.UnitTests;
 
 // see https://stackoverflow.com/questions/1408175/execute-unit-tests-serially-rather-than-in-parallel
 [Collection("Sequential")]
-public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
+public class TestDistributedFileStoreCacheStringWithExtras
 {
     private readonly IDistributedFileStoreCacheStringWithExtras _distributedCache;
     private readonly DistributedFileStoreCacheOptions _options;
@@ -68,6 +68,24 @@ public class TestDistributedFileStoreCacheStringWithExtras //: IDisposable
         var allValues = _distributedCache.GetAllKeyValues();
         allValues.Count.ShouldEqual(1);
         allValues["test"].ShouldEqual("goodbye");
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSet_Unicode()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        var unicode = "בָּרוּךְ אַתָּה ה' אֱ-לֹהֵינוּ, מֶלֶך הָעוֹלָם";
+        _distributedCache.Set("test", unicode, null);
+
+        //VERIFY
+        var allValues = _distributedCache.GetAllKeyValues();
+        allValues.Count.ShouldEqual(1);
+        allValues["test"].ShouldEqual(unicode);
 
         _options.DisplayCacheFile(_output);
     }

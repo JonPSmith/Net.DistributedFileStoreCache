@@ -2,7 +2,6 @@
 // Licensed under MIT license. See License.txt in the project root for license information.
 
 using System.Text;
-using Microsoft.Extensions.Caching.Distributed;
 using Net.DistributedFileStoreCache;
 using Net.DistributedFileStoreCache.SupportCode;
 using Test.TestHelpers;
@@ -28,7 +27,6 @@ public class TestStaticCachePart
         {
             PathToCacheFileDirectory = TestData.GetTestDataDir(),
             SecondPartOfCacheFileName = GetType().Name,
-            IndentJsonInCacheFile = true,
             TurnOffStaticFilePathCheck = true
         };
     }
@@ -84,10 +82,12 @@ public class TestStaticCachePart
     public void TestStartupNoCacheFile()
     {
         //SETUP
-        if (File.Exists(_options.FormCacheFilePath())) File.Delete(_options.FormCacheFilePath());
+        if (File.Exists(_options.FormCacheFilePath())) 
+            File.Delete(_options.FormCacheFilePath());
 
         //ATTEMPT
         StaticCachePart.SetupStaticCache(_options);
+
 
         //VERIFY
         File.Exists(_options.FormCacheFilePath()).ShouldBeTrue();

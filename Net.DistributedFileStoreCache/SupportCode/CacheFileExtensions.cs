@@ -18,5 +18,4 @@ public static class CacheFileExtensions
             throw new ArgumentNullException(nameof(fileStoreCacheOptions.PathToCacheFileDirectory));
         return Path.Combine(fileStoreCacheOptions.PathToCacheFileDirectory, fileStoreCacheOptions.FormCacheFileName());
     }
-
 }

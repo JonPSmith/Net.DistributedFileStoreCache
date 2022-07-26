@@ -12,6 +12,10 @@ namespace Net.DistributedFileStoreCache.SupportCode;
 /// </summary>
 internal static class StaticCachePart
 {
+    //private values
+    private static FileSystemWatcher? _watcher;
+    private static string? _cacheFilePathCheck;
+
     /// <summary>
     /// If this is true, then the cache file must be read in into the 
     /// <see cref="CacheContent"/> static dictionary
@@ -22,10 +26,6 @@ internal static class StaticCachePart
     /// This contains the local static cache of the data in the cache file 
     /// </summary>
     public static CacheJsonContent CacheContent { get; private set; } = new CacheJsonContent();
-
-    //private values
-    private static FileSystemWatcher? _watcher;
-    private static string? _cacheFilePathCheck;
 
 
     /// <summary>
@@ -43,6 +43,8 @@ internal static class StaticCachePart
             //You can only have one static 
             throw new DistributedFileStoreCacheException(
                 "You are trying re-registered the static cache part to a different filepath, which is not allowed.");
+
+        CacheContent = new CacheJsonContent(); //Make sure empty - mainly for unit tests
 
         //Make sure there is a cache file
         var cacheHandler = new CacheFileHandler(fileStoreCacheOptions);

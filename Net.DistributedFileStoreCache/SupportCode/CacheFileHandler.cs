@@ -146,8 +146,6 @@ internal class CacheFileHandler
         }
     }
 
-    private enum CacheChanges { Add, Remove, Reset }
-
     private async ValueTask ReadAndChangeCacheJsonFile(CacheChanges whatToDo, bool useAsync,
         string? key = null, string? value = null, DistributedCacheEntryOptions? entryOptions = null,
         CancellationToken token = new CancellationToken())
@@ -193,16 +191,19 @@ internal class CacheFileHandler
                     throw new ArgumentOutOfRangeException(nameof(whatToDo), whatToDo, null);
             }
 
-            //We immediately update the local cache because a change of the expiration data isn't always updated to the file
-            StaticCachePart.UpdateLocalCache(json);
+            var bytesToWrite = FillByteBufferWithCacheJsonData(json);
+            if (bytesToWrite.Length < _options.MaxBytesInJsonCacheFile)
+            {
+                //If the data has become longer that the set bytes, then we don't update the cache file (which means the change is lost)
 
-            //thanks to https://stackoverflow.com/questions/15628902/lock-file-exclusively-then-delete-move-it
-            fileStream.Seek(0, SeekOrigin.Begin);
-            fileStream.SetLength(0);
-            if (useAsync)
-                await fileStream.WriteAsync(FillByteBufferWithCacheJsonData(json), token);
-            else
-                fileStream.Write(FillByteBufferWithCacheJsonData(json));
+                //thanks to https://stackoverflow.com/questions/15628902/lock-file-exclusively-then-delete-move-it
+                fileStream.Seek(0, SeekOrigin.Begin);
+                fileStream.SetLength(0);
+                if (useAsync)
+                    await fileStream.WriteAsync(bytesToWrite, token);
+                else
+                    fileStream.Write(bytesToWrite);
+            }
 
 
         }
@@ -212,7 +213,7 @@ internal class CacheFileHandler
     {
         if (numBytes == 0)
             return new CacheJsonContent();
-        var jsonString = Encoding.UTF8.GetString(buffer, 0, numBytes);
+        var jsonString = Encoding.ASCII.GetString(buffer, 0, numBytes);
 
         var cacheContent = JsonSerializer.Deserialize<CacheJsonContent>(jsonString)!;
         cacheContent.RemoveExpiredCacheValues();
@@ -221,12 +222,10 @@ internal class CacheFileHandler
 
     private byte[] FillByteBufferWithCacheJsonData(CacheJsonContent allCache)
     {
-        var jsonString = JsonSerializer.Serialize(allCache,
-            new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+        var jsonString = JsonSerializer.Serialize(allCache, _options.JsonSerializerForCacheFile);
 
-        return Encoding.UTF8.GetBytes(jsonString);
+        return Encoding.ASCII.GetBytes(jsonString);
     }
+
+    private enum CacheChanges { Add, Remove, Reset }
 }

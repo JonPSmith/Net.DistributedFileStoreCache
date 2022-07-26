@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Hosting;
 
@@ -66,10 +67,11 @@ public class DistributedFileStoreCacheOptions
     public string? PathToCacheFileDirectory { get; set; }
 
     /// <summary>
+    /// This allows you to change the way the 
     /// By default the json inside the cache file is one long string, which is efficient on space but hard to read.
     /// If you set this to true, then the json inside the cache file will be formatted, which is not efficient on space but easy to read.
     /// </summary>
-    public bool IndentJsonInCacheFile { get; set; } = false;
+    public JsonSerializerOptions JsonSerializerForCacheFile { get; set; } = new JsonSerializerOptions();
 
     /// <summary>
     /// This sets the delay between a retry after a <see cref="UnauthorizedAccessException"/> is throw
@@ -81,5 +83,4 @@ public class DistributedFileStoreCacheOptions
     /// This sets the number of retries after a <see cref="UnauthorizedAccessException"/> is throw
     /// </summary>
     public int NumTriesOnUnauthorizedAccess { get; set; } = 20;
-
 }

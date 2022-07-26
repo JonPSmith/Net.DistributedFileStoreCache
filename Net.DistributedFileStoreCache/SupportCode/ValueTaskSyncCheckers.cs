@@ -56,11 +56,11 @@ internal static class ValueTaskSyncCheckers
 
     private class GenericValueTypeChecker<TResult>
     {
-        public TResult Result { get; }
-
         public GenericValueTypeChecker(dynamic valueTask)
         {
             Result = CheckSyncValueTaskWorkedAndReturnResult(((ValueTask<TResult>)valueTask));
         }
+
+        public TResult Result { get; }
     }
 }
