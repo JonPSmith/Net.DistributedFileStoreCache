@@ -72,5 +72,5 @@ public interface IDistributedFileStoreCacheStringWithExtras
     /// This return all the cached values as a dictionary
     /// </summary>
     /// <returns></returns>
-    Task<IReadOnlyDictionary<string, string>> GetAllKeyValuesAsync();
+    Task<IReadOnlyDictionary<string, string>> GetAllKeyValuesAsync(CancellationToken token = new CancellationToken());
 }
