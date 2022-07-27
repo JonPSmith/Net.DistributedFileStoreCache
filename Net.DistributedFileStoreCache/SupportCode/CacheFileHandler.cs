@@ -212,8 +212,7 @@ internal class CacheFileHandler
     {
         if (numBytes == 0)
             return new CacheJsonContent();
-        var jsonString = //numBytes.GetString(ref buffer);
-            Encoding.UTF8.GetString(buffer, 0, numBytes);
+        var jsonString = Encoding.UTF8.GetString(buffer, 0, numBytes);
 
         var cacheContent = JsonSerializer.Deserialize<CacheJsonContent>(jsonString)!;
         cacheContent.RemoveExpiredCacheValues();
@@ -225,7 +224,6 @@ internal class CacheFileHandler
         var jsonString = JsonSerializer.Serialize(allCache, _options.JsonSerializerForCacheFile);
 
         return Encoding.UTF8.GetBytes(jsonString);
-        //return jsonString.GetBytes();
     }
 
 
