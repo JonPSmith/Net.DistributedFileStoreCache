@@ -145,6 +145,7 @@ internal class CacheFileHandler
             StaticCachePart.UpdateLocalCache(GetJsonFromByteBuffer(numBytesRead, ref readBuffer));
         }
     }
+    private enum CacheChanges { Add, Remove, Reset }
 
     private async ValueTask ReadAndChangeCacheJsonFile(CacheChanges whatToDo, bool useAsync,
         string? key = null, string? value = null, DistributedCacheEntryOptions? entryOptions = null,
@@ -204,8 +205,6 @@ internal class CacheFileHandler
                 else
                     fileStream.Write(bytesToWrite);
             }
-
-
         }
     }
 
@@ -213,7 +212,8 @@ internal class CacheFileHandler
     {
         if (numBytes == 0)
             return new CacheJsonContent();
-        var jsonString = Encoding.ASCII.GetString(buffer, 0, numBytes);
+        var jsonString = //numBytes.GetString(ref buffer);
+            Encoding.UTF8.GetString(buffer, 0, numBytes);
 
         var cacheContent = JsonSerializer.Deserialize<CacheJsonContent>(jsonString)!;
         cacheContent.RemoveExpiredCacheValues();
@@ -224,8 +224,9 @@ internal class CacheFileHandler
     {
         var jsonString = JsonSerializer.Serialize(allCache, _options.JsonSerializerForCacheFile);
 
-        return Encoding.ASCII.GetBytes(jsonString);
+        return Encoding.UTF8.GetBytes(jsonString);
+        //return jsonString.GetBytes();
     }
 
-    private enum CacheChanges { Add, Remove, Reset }
+
 }

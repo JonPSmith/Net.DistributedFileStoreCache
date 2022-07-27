@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
@@ -32,6 +34,8 @@ public class TestDistributedFileStoreCacheStringWithExtras
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;
+            options.JsonSerializerForCacheFile = new JsonSerializerOptions
+                { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
         });
         var serviceProvider = services.BuildServiceProvider();
 

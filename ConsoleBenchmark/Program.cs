@@ -17,15 +17,15 @@ public class ConsoleBenchmark
             options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
             options.PathToCacheFileDirectory = TestData.GetCallingAssemblyTopLevelDir();
             options.SecondPartOfCacheFileName = GetType().Name;
-            options.MaxBytesInJsonCacheFile = 50 * 1000;
+            options.MaxBytesInJsonCacheFile = 50 * 10000;
         });
         var serviceProvider = services.BuildServiceProvider();
 
         _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
     }
 
-    //[Params(1000)]
-    [Params(10, 100, 1000)]
+    //[Params(10_000)]
+    [Params(100, 1000, 10_000)]
     public int NumKeysAtStart { get; set; }
 
     [GlobalSetup]
@@ -34,7 +34,7 @@ public class ConsoleBenchmark
         _distributedCache.ClearAll();
         for (int i = 0; i < NumKeysAtStart; i++)
         {
-            _distributedCache.Set($"Key{i:D3}", DateTime.UtcNow.ToString("O"), null);
+            _distributedCache.Set($"Key{i:D4}", DateTime.UtcNow.ToString("O"), null);
         }
     }
 
@@ -55,7 +55,13 @@ public class ConsoleBenchmark
     [Benchmark]
     public void GetKey()
     {
-        _distributedCache.Get("Key000");
+        _distributedCache.Get("Key0000");
+    }
+
+    [Benchmark]
+    public void GetAllKeyValues()
+    {
+        var all = _distributedCache.GetAllKeyValues();
     }
 }
 

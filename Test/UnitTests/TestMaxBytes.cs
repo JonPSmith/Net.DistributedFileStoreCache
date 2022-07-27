@@ -56,24 +56,4 @@ public class TestMaxBytes
         //VERIFY
         cache.GetAllKeyValues().Count.ShouldEqual(numValues);
     }
-
-    [Fact]
-    public void TestJsonSerializerOptionsUnsafeRelaxedJsonEscaping()
-    {
-        var x = new Dictionary<string, short[]> {
-            {"Test1", new short[] { 1,2,3,40,60,255 }},
-            {"Test2", new short[] { 400, 32000 }}
-        };
-        var options = new JsonSerializerOptions
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
-        var jsonString = JsonSerializer.Serialize(x, options);
-        _output.WriteLine(jsonString);
-
-        var result = JsonSerializer.Deserialize<Dictionary<string, short[]>>(jsonString);
-
-        result.ShouldEqual(x);
-    }
-
 }

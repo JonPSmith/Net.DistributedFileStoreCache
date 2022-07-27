@@ -33,11 +33,8 @@ public static class DisplayExtensions
                 return;
             }
 
-            var lines = File.ReadAllLines(cacheFilePath);
-            foreach (var line in lines)
-            {
-                output.WriteLine(line);
-            }
+            var text = File.ReadAllText(cacheFilePath);
+            output.WriteLine(text);
         });
     }
 }
