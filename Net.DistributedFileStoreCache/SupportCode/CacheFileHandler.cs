@@ -204,6 +204,9 @@ internal class CacheFileHandler
                     await fileStream.WriteAsync(bytesToWrite, token);
                 else
                     fileStream.Write(bytesToWrite);
+
+                //This is here to try and negate the first trigger of the file change
+                StaticCachePart.UpdateLocalCache(json);
             }
         }
     }

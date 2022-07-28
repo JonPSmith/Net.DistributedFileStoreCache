@@ -84,12 +84,14 @@ public class TestDistributedFileStoreCacheStringWithExtras
 
         //ATTEMPT
         var unicode = "בָּרוּךְ אַתָּה ה' אֱ-לֹהֵינוּ, מֶלֶך הָעוֹלָם";
-        _distributedCache.Set("test", unicode, null);
+        _distributedCache.Set("Unicode", unicode, null);
+        _distributedCache.Set("ascii", "my ascii", null);
 
         //VERIFY
         var allValues = _distributedCache.GetAllKeyValues();
-        allValues.Count.ShouldEqual(1);
-        allValues["test"].ShouldEqual(unicode);
+        allValues.Count.ShouldEqual(2);
+        allValues["Unicode"].ShouldEqual(unicode);
+        allValues["ascii"].ShouldEqual("my ascii");
 
         _options.DisplayCacheFile(_output);
     }
