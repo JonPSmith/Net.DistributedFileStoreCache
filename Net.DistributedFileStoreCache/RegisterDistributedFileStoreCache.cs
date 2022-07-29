@@ -39,9 +39,9 @@ public static class RegisterDistributedFileStoreCache
         //This registers the base DistributedFileStoreCacheStringWithExtras service
         services.AddTransient<IDistributedFileStoreCacheStringWithExtras, DistributedFileStoreCacheStringWithExtras>();
         //Selects which interface to register the service to
-        if (options.WhichInterface == DistributedFileStoreCacheInterfaces.DistributedCache)
+        if (options.WhichVersion == FileStoreCacheVersions.DistributedCache)
             services.AddSingleton<IDistributedCache, DistributedFileStoreCache>();
-        else if (options.WhichInterface == DistributedFileStoreCacheInterfaces.DistributedFileStoreWithExtras)
+        else if (options.WhichVersion == FileStoreCacheVersions.FileStoreCacheByteWithExtras)
             services.AddSingleton<IDistributedFileStoreCacheWithExtras, DistributedFileStoreCache>();
 
         return services;

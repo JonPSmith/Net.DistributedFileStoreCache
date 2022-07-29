@@ -3,11 +3,23 @@ Net.DistributedFileStoreCache
 
 ## Performance figures
 
+I used 
+
+Each key/value takes 37 charcters and the size of the cache file are:
+
+| NumKeysValues | Cache file size|
+|-------------- |------------:|
+|           100 |      4.6 kb |
+|          1000 |     40.1 kb |
+|         10000 |    400.0 kb |
+
 BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1766 (21H1/May2021Update)
 Intel Core i9-9940X CPU 3.30GHz, 1 CPU, 28 logical and 14 physical cores
 .NET SDK=6.0.203
   [Host]     : .NET 6.0.7 (6.0.722.32202), X64 RyuJIT
   DefaultJob : .NET 6.0.7 (6.0.722.32202), X64 RyuJIT
+
+
 
 ### Read times
 
@@ -31,8 +43,6 @@ Summary of the write side is:
 
 - Adding a cache value to cache goes up as the size of the cache is. This makes sense as unlike a database you 
 are reading and then writing ALL the cache values into a file.
-
-_Note: The cache containing 10,000 cache values was roughly 1/2 Mb in size._ 
 
 |          Method | NumKeysAtStart |        Mean |     Error |    StdDev |
 |---------------- |--------------- |------------:|----------:|----------:|

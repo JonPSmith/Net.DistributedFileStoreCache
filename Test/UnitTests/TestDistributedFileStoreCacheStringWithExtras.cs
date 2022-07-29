@@ -30,7 +30,7 @@ public class TestDistributedFileStoreCacheStringWithExtras
         var services = new ServiceCollection();
         services.AddDistributedFileStoreCache(options =>
         {
-            options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
+            options.WhichVersion = FileStoreCacheVersions.FileStoreCacheStrings;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;

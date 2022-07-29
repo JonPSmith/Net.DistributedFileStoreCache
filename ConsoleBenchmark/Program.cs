@@ -14,7 +14,7 @@ public class ConsoleBenchmark
         var services = new ServiceCollection();
         services.AddDistributedFileStoreCache(options =>
         {
-            options.WhichInterface = DistributedFileStoreCacheInterfaces.DistributedFileStoreStringWithExtras;
+            options.WhichVersion = FileStoreCacheVersions.FileStoreCacheStrings;
             options.PathToCacheFileDirectory = TestData.GetCallingAssemblyTopLevelDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.MaxBytesInJsonCacheFile = 50 * 10000;

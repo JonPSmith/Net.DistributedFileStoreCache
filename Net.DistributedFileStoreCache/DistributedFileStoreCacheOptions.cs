@@ -7,31 +7,33 @@ using Microsoft.Extensions.Hosting;
 
 namespace Net.DistributedFileStoreCache;
 
-public enum DistributedFileStoreCacheInterfaces
+public enum FileStoreCacheVersions
 {
+    /// <summary>
+    /// Use this to register the <see cref="DistributedFileStoreCacheStringWithExtras"/> against the <see cref="IDistributedFileStoreCacheStringWithExtras"/> interface
+    /// </summary>
+    FileStoreCacheStrings,
+    /// <summary>
+    /// Use this to register the <see cref="DistributedFileStoreCache"/> against the <see cref="IDistributedFileStoreCacheWithExtras"/> interface
+    /// </summary>
+    FileStoreCacheByteWithExtras,
     /// <summary>
     /// Use this to register the <see cref="DistributedFileStoreCache"/> against the <see cref="DistributedCache"/> interface
     /// </summary>
     DistributedCache,
-    /// <summary>
-    /// Use this to register the <see cref="DistributedFileStoreCache"/> against the <see cref="IDistributedFileStoreCacheWithExtras"/> interface
-    /// </summary>
-    DistributedFileStoreWithExtras,
-    /// <summary>
-    /// Use this to register the <see cref="DistributedFileStoreCacheStringWithExtras"/> against the <see cref="IDistributedFileStoreCacheStringWithExtras"/> interface
-    /// </summary>
-    DistributedFileStoreStringWithExtras
+
+
 }
 
 public class DistributedFileStoreCacheOptions
 {
     /// <summary>
     /// This defines which version of the <see cref="DistributedFileStoreCache"/> services are registered
-    /// 1. Default is <see cref="IDistributedCache"/>, which provides the base set of services.
-    /// 2. If set to <see cref="IDistributedFileStoreCacheWithExtras"/>, then that interface provides two extra features
-    /// 3. If set to <see cref="IDistributedFileStoreCacheStringWithExtras"/>, then that interface uses string for the value (plus the extra features)
+    /// 1. Default is <see cref="IDistributedFileStoreCacheStringWithExtras"/>, where the value is of type string, plus two extra features
+    /// 2. If set to <see cref="IDistributedFileStoreCacheWithExtras"/>, where the value is of type byte[], plus two extra features
+    /// 3. If set to <see cref="FileStoreCacheVersions.DistributedCache"/>, which implements the <see cref="IDistributedCache"/> interface
     /// </summary>
-    public DistributedFileStoreCacheInterfaces WhichInterface { get; set; }
+    public FileStoreCacheVersions WhichVersion { get; set; }
 
     /// <summary>
     /// This defines the maximum bytes that can be in the cache json file.
