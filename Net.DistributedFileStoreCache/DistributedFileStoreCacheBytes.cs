@@ -1,45 +1,51 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
+using System.Text;
 using Microsoft.Extensions.Caching.Distributed;
-using Net.DistributedFileStoreCache.SupportCode;
 
 namespace Net.DistributedFileStoreCache;
 
-public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCacheStringWithExtras
+public class DistributedFileStoreCacheBytes : IDistributedFileStoreCacheBytes
 {
-    private readonly CacheFileHandler _cacheFileHandler;
+    private readonly IDistributedFileStoreCacheString _stringCache;
 
-
-    public DistributedFileStoreCacheStringWithExtras(DistributedFileStoreCacheOptions fileStoreCacheOptions)
+    public DistributedFileStoreCacheBytes(IDistributedFileStoreCacheString stringCache)
     {
-        _cacheFileHandler = new CacheFileHandler(fileStoreCacheOptions);
+        _stringCache = stringCache;
     }
 
     /// <summary>Gets a value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     /// <returns>The located value or null.</returns>
-    public string? Get(string key)
+    public byte[]? Get(string key)
     {
-        return _cacheFileHandler.GetValue(key);
+        var stringValue = _stringCache.Get(key);
+        if (stringValue == null)
+            return null;
+        return Encoding.UTF8.GetBytes(stringValue);
     }
 
     /// <summary>Gets a value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
     /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation, containing the located value or null.</returns>
-    public Task<string?> GetAsync(string key, CancellationToken token = new CancellationToken())
+    public async Task<byte[]?> GetAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.GetValueAsync(key, token);
+        var stringValue = await _stringCache.GetAsync(key, token);
+        if (stringValue == null)
+            return null;
+        return Encoding.UTF8.GetBytes(stringValue);
     }
 
     /// <summary>Sets a value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     /// <param name="value">The value to set in the cache.</param>
     /// <param name="options">The cache options for the value.</param>
-    public void Set(string key, string value, DistributedCacheEntryOptions? options)
+    public void Set(string key, byte[] value, DistributedCacheEntryOptions? options)
     {
-        _cacheFileHandler.SetKeyValue(key, value, options);
+        if (value == null) throw new ArgumentNullException(nameof(value));
+        _stringCache.Set(key, Encoding.UTF8.GetString(value), options);
     }
 
     /// <summary>Sets the value with the given key.</summary>
@@ -47,11 +53,11 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <param name="value">The value to set in the cache.</param>
     /// <param name="options">The cache options for the value.</param>
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
-    /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
-    public Task SetAsync(string key, string value, DistributedCacheEntryOptions? options,
+    public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions? options,
         CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.SetKeyValueAsync(key, value, options, token);
+        if (value == null) throw new ArgumentNullException(nameof(value));
+        return _stringCache.SetAsync(key, Encoding.UTF8.GetString(value), options, token);
     }
 
     /// <summary>
@@ -60,7 +66,7 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <param name="key">A string identifying the requested value.</param>
     public void Refresh(string key)
     {
-        throw new NotImplementedException("This library doesn't support sliding expirations for performance reasons.");
+        _stringCache.Refresh(key);
     }
 
     /// <summary>
@@ -70,23 +76,22 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
     public Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
     {
-        throw new NotImplementedException("This library doesn't support sliding expirations for performance reasons.");
+        return _stringCache.RefreshAsync(key);
     }
 
     /// <summary>Removes the value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     public void Remove(string key)
     {
-        _cacheFileHandler.RemoveKeyValue(key);
+        _stringCache.Remove(key);
     }
 
     /// <summary>Removes the value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
-    /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
     public Task RemoveAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.RemoveKeyValueAsync(key, token);
+        return _stringCache.RemoveAsync(key, token);
     }
 
     /// <summary>
@@ -94,24 +99,36 @@ public class DistributedFileStoreCacheStringWithExtras : IDistributedFileStoreCa
     /// </summary>
     public void ClearAll()
     {
-        _cacheFileHandler.ResetCacheFile();
+        _stringCache.ClearAll();
     }
 
     /// <summary>
     /// This return all the cached values as a dictionary
     /// </summary>
     /// <returns></returns>
-    public IReadOnlyDictionary<string, string> GetAllKeyValues()
+    public Dictionary<string, byte[]> GetAllKeyValues()
     {
-        return _cacheFileHandler.GetAllValues();
+        var stringValues = _stringCache.GetAllKeyValues();
+
+        var stringByteDictionary = new Dictionary<string, byte[]>();
+        foreach (var key in stringValues.Keys)
+        {
+            stringByteDictionary.Add(key, Encoding.UTF8.GetBytes(stringValues[key]));
+        }
+
+        return stringByteDictionary;
     }
 
-    /// <summary>
-    /// This return all the cached values as a dictionary
-    /// </summary>
-    /// <returns></returns>
-    public Task<IReadOnlyDictionary<string, string>> GetAllKeyValuesAsync(CancellationToken token = new CancellationToken())
+    public async Task<IReadOnlyDictionary<string, byte[]>> GetAllKeyValuesAsync()
     {
-        return _cacheFileHandler.GetAllValuesAsync(token);
+        var stringValues = await _stringCache.GetAllKeyValuesAsync();
+
+        var stringByteDictionary = new Dictionary<string, byte[]>();
+        foreach (var key in stringValues.Keys)
+        {
+            stringByteDictionary.Add(key, Encoding.UTF8.GetBytes(stringValues[key]));
+        }
+
+        return stringByteDictionary;
     }
 }

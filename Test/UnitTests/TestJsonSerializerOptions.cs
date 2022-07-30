@@ -25,10 +25,10 @@ public class TestJsonSerializerOptions
         _output = output;
     }
 
-    private IDistributedFileStoreCacheStringWithExtras SetupCache(JsonSerializerOptions jsonOptions)
+    private IDistributedFileStoreCacheString SetupCache(JsonSerializerOptions jsonOptions)
     {
         var services = new ServiceCollection();
-        services.AddDistributedFileStoreCache(options =>
+        _options = services.AddDistributedFileStoreCache(options =>
         {
             options.WhichVersion = FileStoreCacheVersions.FileStoreCacheStrings;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
@@ -39,8 +39,7 @@ public class TestJsonSerializerOptions
         });
         var serviceProvider = services.BuildServiceProvider();
 
-        _options = serviceProvider.GetService<DistributedFileStoreCacheOptions>()!;
-        return serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
+        return serviceProvider.GetRequiredService<IDistributedFileStoreCacheString>();
     }
 
     [Fact]

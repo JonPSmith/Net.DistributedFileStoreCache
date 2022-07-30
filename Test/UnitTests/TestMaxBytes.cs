@@ -21,7 +21,7 @@ public class TestMaxBytes
         _output = output;
     }
 
-    private IDistributedFileStoreCacheStringWithExtras SetupCache(int maxBytes)
+    private IDistributedFileStoreCacheString SetupCache(int maxBytes)
     {
         var services = new ServiceCollection();
         services.AddDistributedFileStoreCache(options =>
@@ -35,7 +35,7 @@ public class TestMaxBytes
         });
         var serviceProvider = services.BuildServiceProvider();
 
-        return serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
+        return serviceProvider.GetRequiredService<IDistributedFileStoreCacheString>();
     }
 
     [Theory]

@@ -24,10 +24,10 @@ public class TestCacheServiceParallel
         _output = output;
     }
 
-    private IDistributedFileStoreCacheStringWithExtras SetupDistributedFileStoreCache()
+    private IDistributedFileStoreCacheString SetupDistributedFileStoreCache()
     {
         var services = new ServiceCollection();
-        services.AddDistributedFileStoreCache(options =>
+        _options = services.AddDistributedFileStoreCache(options =>
         {
             options.WhichVersion = FileStoreCacheVersions.FileStoreCacheStrings;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
@@ -35,8 +35,7 @@ public class TestCacheServiceParallel
             options.TurnOffStaticFilePathCheck = true;
         });
         var serviceProvider = services.BuildServiceProvider();
-        _options = serviceProvider.GetRequiredService<DistributedFileStoreCacheOptions>();
-        return serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
+        return serviceProvider.GetRequiredService<IDistributedFileStoreCacheString>();
     }
 
     [Fact]

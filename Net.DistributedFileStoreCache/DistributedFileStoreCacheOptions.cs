@@ -10,15 +10,15 @@ namespace Net.DistributedFileStoreCache;
 public enum FileStoreCacheVersions
 {
     /// <summary>
-    /// Use this to register the <see cref="DistributedFileStoreCacheStringWithExtras"/> against the <see cref="IDistributedFileStoreCacheStringWithExtras"/> interface
+    /// Use this to register the <see cref="DistributedFileStoreCacheString"/> against the <see cref="IDistributedFileStoreCacheString"/> interface
     /// </summary>
     FileStoreCacheStrings,
     /// <summary>
-    /// Use this to register the <see cref="DistributedFileStoreCache"/> against the <see cref="IDistributedFileStoreCacheWithExtras"/> interface
+    /// Use this to register the <see cref="DistributedFileStoreCacheBytes"/> against the <see cref="IDistributedFileStoreCacheBytes"/> interface
     /// </summary>
-    FileStoreCacheByteWithExtras,
+    FileStoreCacheBytes,
     /// <summary>
-    /// Use this to register the <see cref="DistributedFileStoreCache"/> against the <see cref="DistributedCache"/> interface
+    /// Use this to register the <see cref="DistributedFileStoreCacheBytes"/> against the <see cref="IDistributedCache"/> interface
     /// </summary>
     DistributedCache,
 
@@ -28,9 +28,9 @@ public enum FileStoreCacheVersions
 public class DistributedFileStoreCacheOptions
 {
     /// <summary>
-    /// This defines which version of the <see cref="DistributedFileStoreCache"/> services are registered
-    /// 1. Default is <see cref="IDistributedFileStoreCacheStringWithExtras"/>, where the value is of type string, plus two extra features
-    /// 2. If set to <see cref="IDistributedFileStoreCacheWithExtras"/>, where the value is of type byte[], plus two extra features
+    /// This defines which version of the <see cref="DistributedFileStoreCacheBytes"/> services are registered
+    /// 1. Default is <see cref="IDistributedFileStoreCacheString"/>, where the value is of type string, plus two extra features
+    /// 2. If set to <see cref="IDistributedFileStoreCacheBytes"/>, where the value is of type byte[], plus two extra features
     /// 3. If set to <see cref="FileStoreCacheVersions.DistributedCache"/>, which implements the <see cref="IDistributedCache"/> interface
     /// </summary>
     public FileStoreCacheVersions WhichVersion { get; set; }
@@ -42,7 +42,7 @@ public class DistributedFileStoreCacheOptions
     public int MaxBytesInJsonCacheFile { get; set; } = 10_000;
 
     /// <summary>
-    /// This holds the first part of the distributed cache file used by the <see cref="DistributedFileStoreCache"/>.
+    /// This holds the first part of the distributed cache file used by the <see cref="DistributedFileStoreCacheBytes"/>.
     /// Note that it shouldn't have the file type (e.g. ".json") on the name
     /// </summary>
     public string FirstPartOfCacheFileName { get; set; } = "DistributedCacheFile";
@@ -56,7 +56,7 @@ public class DistributedFileStoreCacheOptions
     public string? SecondPartOfCacheFileName { get; set; }
 
     /// <summary>
-    /// By default this will check that you are trying to register more then one <see cref="DistributedFileStoreCache"/>.
+    /// By default this will check that you are trying to register more then one <see cref="DistributedFileStoreCacheBytes"/>.
     /// You need to set this to true if you are running unit tests with different cache file names (and run tests serially)
     /// </summary>
     public bool TurnOffStaticFilePathCheck { get; set; } = false;

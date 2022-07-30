@@ -17,7 +17,7 @@ namespace Test.UnitTests;
 [Collection("Sequential")]
 public class TestIDistributedFileStoreCacheWithExtras
 {
-    private readonly IDistributedFileStoreCacheWithExtras _distributedCache;
+    private readonly IDistributedFileStoreCacheBytes _distributedCache;
     private readonly DistributedFileStoreCacheOptions _options;
     private readonly ITestOutputHelper _output;
 
@@ -26,9 +26,9 @@ public class TestIDistributedFileStoreCacheWithExtras
         _output = output;
 
         var services = new ServiceCollection();
-        services.AddDistributedFileStoreCache(options =>
+        _options = services.AddDistributedFileStoreCache(options =>
         {
-            options.WhichVersion = FileStoreCacheVersions.FileStoreCacheByteWithExtras;
+            options.WhichVersion = FileStoreCacheVersions.FileStoreCacheBytes;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.JsonSerializerForCacheFile = new JsonSerializerOptions
@@ -37,8 +37,7 @@ public class TestIDistributedFileStoreCacheWithExtras
         });
         var serviceProvider = services.BuildServiceProvider();
 
-        _options = serviceProvider.GetRequiredService<DistributedFileStoreCacheOptions>();
-        _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheWithExtras>();
+        _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheBytes>();
     }
 
     [Fact]

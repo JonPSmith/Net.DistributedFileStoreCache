@@ -5,7 +5,7 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Net.DistributedFileStoreCache;
 
-public interface IDistributedFileStoreCacheStringWithExtras
+public interface IDistributedFileStoreCacheString
 {
     /// <summary>Gets a value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>

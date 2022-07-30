@@ -7,7 +7,7 @@ using TestSupport.Helpers;
 
 public class ConsoleBenchmark
 {
-    private readonly IDistributedFileStoreCacheStringWithExtras _distributedCache;
+    private readonly IDistributedFileStoreCacheString _distributedCache;
 
     public ConsoleBenchmark()
     {
@@ -21,7 +21,7 @@ public class ConsoleBenchmark
         });
         var serviceProvider = services.BuildServiceProvider();
 
-        _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
+        _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheString>();
     }
 
     //[Params(10_000)]

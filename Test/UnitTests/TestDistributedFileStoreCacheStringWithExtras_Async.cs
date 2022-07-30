@@ -17,7 +17,7 @@ namespace Test.UnitTests;
 [Collection("Sequential")]
 public class TestDistributedFileStoreCacheStringWithExtras_Async 
 {
-    private readonly IDistributedFileStoreCacheStringWithExtras _distributedCache;
+    private readonly IDistributedFileStoreCacheString _distributedCache;
     private readonly DistributedFileStoreCacheOptions _options;
     private readonly ITestOutputHelper _output;
 
@@ -26,7 +26,7 @@ public class TestDistributedFileStoreCacheStringWithExtras_Async
         _output = output;
 
         var services = new ServiceCollection();
-        services.AddDistributedFileStoreCache(options =>
+        _options = services.AddDistributedFileStoreCache(options =>
         {
             options.WhichVersion = FileStoreCacheVersions.FileStoreCacheStrings;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
@@ -35,8 +35,7 @@ public class TestDistributedFileStoreCacheStringWithExtras_Async
         });
         var serviceProvider = services.BuildServiceProvider();
 
-        _options = serviceProvider.GetRequiredService<DistributedFileStoreCacheOptions>();
-        _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheStringWithExtras>();
+        _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheString>();
     }
 
     [Fact]

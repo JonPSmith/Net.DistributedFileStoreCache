@@ -10,7 +10,7 @@ namespace Net.DistributedFileStoreCache;
 
 public static class RegisterDistributedFileStoreCache
 {
-    public static IServiceCollection AddDistributedFileStoreCache(this IServiceCollection services,
+    public static DistributedFileStoreCacheOptions AddDistributedFileStoreCache(this IServiceCollection services,
         Action<DistributedFileStoreCacheOptions>? optionsAction = null,
         IHostEnvironment? environment = null)
     {
@@ -35,15 +35,21 @@ public static class RegisterDistributedFileStoreCache
         StaticCachePart.SetupStaticCache(options);
 
         // Add services to the container.
-        services.AddSingleton(options);
-        //This registers the base DistributedFileStoreCacheStringWithExtras service
-        services.AddTransient<IDistributedFileStoreCacheStringWithExtras, DistributedFileStoreCacheStringWithExtras>();
-        //Selects which interface to register the service to
-        if (options.WhichVersion == FileStoreCacheVersions.DistributedCache)
-            services.AddSingleton<IDistributedCache, DistributedFileStoreCache>();
-        else if (options.WhichVersion == FileStoreCacheVersions.FileStoreCacheByteWithExtras)
-            services.AddSingleton<IDistributedFileStoreCacheWithExtras, DistributedFileStoreCache>();
+        switch (options.WhichVersion)
+        {
+            case FileStoreCacheVersions.FileStoreCacheStrings:
+                services.AddSingleton<IDistributedFileStoreCacheString>(new DistributedFileStoreCacheString(options));
+                break;
+            case FileStoreCacheVersions.FileStoreCacheBytes:
+                services.AddSingleton<IDistributedFileStoreCacheBytes>(new DistributedFileStoreCacheBytes(new DistributedFileStoreCacheString(options)));
+                break;
+            case FileStoreCacheVersions.DistributedCache:
+                services.AddSingleton(new DistributedFileStoreCacheBytes(new DistributedFileStoreCacheString(options)) as IDistributedCache);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
 
-        return services;
+        return options;
     }
 }

@@ -8,7 +8,7 @@ namespace Net.DistributedFileStoreCache;
 /// <summary>
 /// This adds a couple of useful features beyond the <see cref="IDistributedCache"/> interface
 /// </summary>
-public interface IDistributedFileStoreCacheWithExtras : IDistributedCache
+public interface IDistributedFileStoreCacheBytes : IDistributedCache
 {
     /// <summary>
     /// This clears all the key/value pairs from the json cache file
