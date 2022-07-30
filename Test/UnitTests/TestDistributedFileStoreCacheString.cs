@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
@@ -17,13 +15,13 @@ namespace Test.UnitTests;
 
 // see https://stackoverflow.com/questions/1408175/execute-unit-tests-serially-rather-than-in-parallel
 [Collection("Sequential")]
-public class TestDistributedFileStoreCacheStringWithExtras
+public class TestDistributedFileStoreCacheString
 {
     private readonly IDistributedFileStoreCacheString _distributedCache;
     private readonly DistributedFileStoreCacheOptions _options;
     private readonly ITestOutputHelper _output;
 
-    public TestDistributedFileStoreCacheStringWithExtras(ITestOutputHelper output)
+    public TestDistributedFileStoreCacheString(ITestOutputHelper output)
     {
         _output = output;
 
@@ -34,8 +32,6 @@ public class TestDistributedFileStoreCacheStringWithExtras
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;
-            options.JsonSerializerForCacheFile = new JsonSerializerOptions
-                { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
         });
         var serviceProvider = services.BuildServiceProvider();
 
@@ -135,18 +131,6 @@ public class TestDistributedFileStoreCacheStringWithExtras
         //ATTEMPT
         var ex = Assert.Throws<NotImplementedException>(() => _distributedCache.Set("test-bad", "time1", 
             new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromTicks(1) }));
-
-        //VERIFY
-        ex.Message.ShouldEqual("This library doesn't support sliding expirations for performance reasons.");
-    }
-
-    [Fact]
-    public void DistributedFileStoreCacheSet_Refresh()
-    {
-        //SETUP
-
-        //ATTEMPT
-        var ex = Assert.Throws<NotImplementedException>(() => _distributedCache.Refresh("test"));
 
         //VERIFY
         ex.Message.ShouldEqual("This library doesn't support sliding expirations for performance reasons.");

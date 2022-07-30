@@ -40,6 +40,9 @@ public static class RegisterDistributedFileStoreCache
             case FileStoreCacheVersions.FileStoreCacheStrings:
                 services.AddSingleton<IDistributedFileStoreCacheString>(new DistributedFileStoreCacheString(options));
                 break;
+            case FileStoreCacheVersions.FileStoreCacheClasses:
+                services.AddSingleton<IDistributedFileStoreCacheClass>(new DistributedFileStoreCacheClass(options));
+                break;
             case FileStoreCacheVersions.FileStoreCacheBytes:
                 services.AddSingleton<IDistributedFileStoreCacheBytes>(new DistributedFileStoreCacheBytes(new DistributedFileStoreCacheString(options)));
                 break;

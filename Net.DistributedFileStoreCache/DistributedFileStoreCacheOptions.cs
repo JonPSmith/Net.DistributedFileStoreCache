@@ -14,6 +14,10 @@ public enum FileStoreCacheVersions
     /// </summary>
     FileStoreCacheStrings,
     /// <summary>
+    /// Use this to register the <see cref="DistributedFileStoreCacheClass"/> against the <see cref="IDistributedFileStoreCacheClasses"/> interface
+    /// </summary>
+    FileStoreCacheClasses,
+    /// <summary>
     /// Use this to register the <see cref="DistributedFileStoreCacheBytes"/> against the <see cref="IDistributedFileStoreCacheBytes"/> interface
     /// </summary>
     FileStoreCacheBytes,

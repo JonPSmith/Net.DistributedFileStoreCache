@@ -7,7 +7,10 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Net.DistributedFileStoreCache.SupportCode;
 
-internal class CacheFileHandler
+/// <summary>
+/// This class should be internal, but you can't use protected internal in a public class.
+/// </summary>
+public class CacheFileHandler
 {
     private readonly DistributedFileStoreCacheOptions _options;
 

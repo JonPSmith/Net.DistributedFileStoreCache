@@ -8,8 +8,7 @@ namespace Net.DistributedFileStoreCache;
 
 public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
 {
-    private readonly CacheFileHandler _cacheFileHandler;
-
+    protected internal readonly CacheFileHandler _cacheFileHandler;
 
     public DistributedFileStoreCacheString(DistributedFileStoreCacheOptions fileStoreCacheOptions)
     {
@@ -52,25 +51,6 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
         CancellationToken token = new CancellationToken())
     {
         return _cacheFileHandler.SetKeyValueAsync(key, value, options, token);
-    }
-
-    /// <summary>
-    /// Refreshes a value in the cache based on its key, resetting its sliding expiration timeout (if any).
-    /// </summary>
-    /// <param name="key">A string identifying the requested value.</param>
-    public void Refresh(string key)
-    {
-        throw new NotImplementedException("This library doesn't support sliding expirations for performance reasons.");
-    }
-
-    /// <summary>
-    /// Refreshes a value in the cache based on its key, resetting its sliding expiration timeout (if any).
-    /// </summary>
-    /// <param name="key">A string identifying the requested value.</param>
-    /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
-    public Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
-    {
-        throw new NotImplementedException("This library doesn't support sliding expirations for performance reasons.");
     }
 
     /// <summary>Removes the value with the given key.</summary>

@@ -33,20 +33,6 @@ public interface IDistributedFileStoreCacheString
     Task SetAsync(string key, string value, DistributedCacheEntryOptions? options,
         CancellationToken token = new CancellationToken());
 
-    /// <summary>
-    /// Refreshes a value in the cache based on its key, resetting its sliding expiration timeout (if any).
-    /// </summary>
-    /// <param name="key">A string identifying the requested value.</param>
-    void Refresh(string key);
-
-    /// <summary>
-    /// Refreshes a value in the cache based on its key, resetting its sliding expiration timeout (if any).
-    /// </summary>
-    /// <param name="key">A string identifying the requested value.</param>
-    /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
-    /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
-    Task RefreshAsync(string key, CancellationToken token = new CancellationToken());
-
     /// <summary>Removes the value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     void Remove(string key);

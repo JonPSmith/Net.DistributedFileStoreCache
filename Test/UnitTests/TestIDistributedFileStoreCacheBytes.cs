@@ -15,13 +15,13 @@ namespace Test.UnitTests;
 
 // see https://stackoverflow.com/questions/1408175/execute-unit-tests-serially-rather-than-in-parallel
 [Collection("Sequential")]
-public class TestIDistributedFileStoreCacheWithExtras
+public class TestIDistributedFileStoreCacheBytes
 {
     private readonly IDistributedFileStoreCacheBytes _distributedCache;
     private readonly DistributedFileStoreCacheOptions _options;
     private readonly ITestOutputHelper _output;
 
-    public TestIDistributedFileStoreCacheWithExtras(ITestOutputHelper output)
+    public TestIDistributedFileStoreCacheBytes(ITestOutputHelper output)
     {
         _output = output;
 
@@ -178,4 +178,31 @@ public class TestIDistributedFileStoreCacheWithExtras
 
         _options.DisplayCacheFile(_output);
     }
+
+    [Fact]
+    public void DistributedFileStoreCacheSet_Refresh()
+    {
+        //SETUP
+
+        //ATTEMPT
+        var ex = Assert.Throws<NotImplementedException>(() => _distributedCache.Refresh("test"));
+
+        //VERIFY
+        ex.Message.ShouldEqual("This library doesn't support sliding expirations for performance reasons.");
+    }
+
+    [Fact]
+    public async Task DistributedFileStoreCacheSet_RefreshAsync()
+    {
+        //SETUP
+
+        //ATTEMPT
+        var ex = await  Assert.ThrowsAsync<NotImplementedException>( async () => await _distributedCache.RefreshAsync("test"));
+
+        //VERIFY
+        ex.Message.ShouldEqual("This library doesn't support sliding expirations for performance reasons.");
+    }
+
+
+
 }

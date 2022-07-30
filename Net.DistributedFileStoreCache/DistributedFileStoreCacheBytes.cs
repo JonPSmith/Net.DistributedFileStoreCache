@@ -66,7 +66,7 @@ public class DistributedFileStoreCacheBytes : IDistributedFileStoreCacheBytes
     /// <param name="key">A string identifying the requested value.</param>
     public void Refresh(string key)
     {
-        _stringCache.Refresh(key);
+        throw new NotImplementedException("This library doesn't support sliding expirations for performance reasons.");
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public class DistributedFileStoreCacheBytes : IDistributedFileStoreCacheBytes
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
     public Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _stringCache.RefreshAsync(key);
+        throw new NotImplementedException("This library doesn't support sliding expirations for performance reasons.");
     }
 
     /// <summary>Removes the value with the given key.</summary>
