@@ -79,6 +79,47 @@ public class TestJsonSerializerOptions
     }
 
     [Fact]
+    public void TestDefaultJsonSerializer_JsonInJson()
+    {
+        //SETUP
+        var cache = SetupCache(new JsonSerializerOptions());
+        cache.ClearAll();
+
+        var value = JsonSerializer.Serialize(new Dictionary<int, string>
+        {
+            {1, "One"}, {2,"Two"}
+        });
+
+        //ATTEMPT
+        cache.Set("Json", value, null);
+
+        //VERIFY
+        var fileContent = File.ReadAllText(_options.FormCacheFilePath());
+        fileContent.ShouldEqual(@"{""Cache"":{""Json"":""{\u00221\u0022:\u0022One\u0022,\u00222\u0022:\u0022Two\u0022}""},""TimeOuts"":{}}");
+    }
+
+    [Fact]
+    public void TestJsonSerializerUnsafeRelaxedJsonEscaping_JsonInJson()
+    {
+        //SETUP
+        var cache = SetupCache(new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+        cache.ClearAll();
+
+        var value = JsonSerializer.Serialize(new Dictionary<int, string>
+        {
+            {1, "One"}, {2,"Two"}
+        });
+
+        //ATTEMPT
+        cache.Set("Json", value, null);
+
+        //VERIFY
+        var fileContent = File.ReadAllText(_options.FormCacheFilePath());
+        fileContent.ShouldEqual(@"{""Cache"":{""Json"":""{\""1\"":\""One\"",\""2\"":\""Two\""}""},""TimeOuts"":{}}");
+    }
+
+    //This test shows that UnsafeRelaxedJsonEscaping doesn't do anything different to normal
+    [Fact]
     public void TestJsonSerializerUnsafeRelaxedJsonEscaping_ASCII()
     {
         //SETUP
@@ -93,6 +134,7 @@ public class TestJsonSerializerOptions
         fileContent.ShouldEqual(@"{""Cache"":{""Test"":""Hello today!""},""TimeOuts"":{}}");
     }
 
+    //This test shows that UnsafeRelaxedJsonEscaping doesn't do anything different to normal
     [Fact]
     public void TestJsonSerializerUnsafeRelaxedJsonEscaping_Bytes()
     {
@@ -110,6 +152,7 @@ public class TestJsonSerializerOptions
         fileContent.ShouldEqual(@"{""Cache"":{""Test"":""\u0001\u0002\u0003""},""TimeOuts"":{}}");
     }
 
+    //This test shows that UnsafeRelaxedJsonEscaping doesn't do anything different to normal
     [Fact]
     public void TestJsonSerializerUnsafeRelaxedJsonEscaping_Unicode()
     {
