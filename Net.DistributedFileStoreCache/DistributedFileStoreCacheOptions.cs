@@ -40,6 +40,17 @@ public class DistributedFileStoreCacheOptions
     public FileStoreCacheVersions WhichVersion { get; set; }
 
     /// <summary>
+    /// This allows you to replace the System.Text.Json default serialization options. Here are some reasons you might want to so this: 
+    /// 1. The default serialization creates one long line, which is efficient on space but hard to read.
+    /// If you set this parameter to a <see cref="JsonSerializerOptions"/> containing { WriteIndented = true },
+    /// then it takes up LOT more space but its easier to read.
+    /// 2. If you are using the <see cref="FileStoreCacheVersions.FileStoreCacheClasses"/> then this parameter to a
+    /// <see cref="JsonSerializerOptions"/> containing { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping },
+    /// then the json is smaller and easier to read.
+    /// </summary>
+    public JsonSerializerOptions JsonSerializerForCacheFile { get; set; } = new JsonSerializerOptions();
+
+    /// <summary>
     /// This defines the maximum bytes that can be in the cache json file.
     /// If you exceed this, then you will have an exception, so I recommend you think .
     /// </summary>
@@ -72,12 +83,6 @@ public class DistributedFileStoreCacheOptions
     /// </summary>
     public string? PathToCacheFileDirectory { get; set; }
 
-    /// <summary>
-    /// This allows you to change the way the 
-    /// By default the json inside the cache file is one long string, which is efficient on space but hard to read.
-    /// If you set this to true, then the json inside the cache file will be formatted, which is not efficient on space but easy to read.
-    /// </summary>
-    public JsonSerializerOptions JsonSerializerForCacheFile { get; set; } = new JsonSerializerOptions();
 
     /// <summary>
     /// This sets the delay between a retry after a <see cref="UnauthorizedAccessException"/> is throw
