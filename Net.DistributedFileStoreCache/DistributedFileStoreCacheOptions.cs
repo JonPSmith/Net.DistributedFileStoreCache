@@ -49,7 +49,7 @@ public class DistributedFileStoreCacheOptions
     /// This holds the first part of the distributed cache file used by the <see cref="DistributedFileStoreCacheBytes"/>.
     /// Note that it shouldn't have the file type (e.g. ".json") on the name
     /// </summary>
-    public string FirstPartOfCacheFileName { get; set; } = "DistributedCacheFile";
+    public string FirstPartOfCacheFileName { get; set; } = "FileStoreCacheFile";
 
     /// <summary>
     /// This provides a suffix to the cache file name <see cref="FirstPartOfCacheFileName"/>
