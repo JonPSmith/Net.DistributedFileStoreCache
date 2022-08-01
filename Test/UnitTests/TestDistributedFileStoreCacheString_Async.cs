@@ -28,7 +28,7 @@ public class TestDistributedFileStoreCacheString_Async
         var services = new ServiceCollection();
         _options = services.AddDistributedFileStoreCache(options =>
         {
-            options.WhichVersion = FileStoreCacheVersions.FileStoreCacheStrings;
+            options.WhichVersion = FileStoreCacheVersions.String;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;

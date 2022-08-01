@@ -12,19 +12,19 @@ public enum FileStoreCacheVersions
     /// <summary>
     /// Use this to register the <see cref="DistributedFileStoreCacheString"/> against the <see cref="IDistributedFileStoreCacheString"/> interface
     /// </summary>
-    FileStoreCacheStrings,
+    String,
     /// <summary>
     /// Use this to register the <see cref="DistributedFileStoreCacheClass"/> against the <see cref="IDistributedFileStoreCacheClasses"/> interface
     /// </summary>
-    FileStoreCacheClasses,
+    Class,
     /// <summary>
     /// Use this to register the <see cref="DistributedFileStoreCacheBytes"/> against the <see cref="IDistributedFileStoreCacheBytes"/> interface
     /// </summary>
-    FileStoreCacheBytes,
+    Bytes,
     /// <summary>
-    /// Use this to register the <see cref="DistributedFileStoreCacheBytes"/> against the <see cref="IDistributedCache"/> interface
+    /// Use this to register the <see cref="DistributedFileStoreCacheBytes"/> against the <see cref="Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> interface
     /// </summary>
-    DistributedCache,
+    IDistributedCache,
 
 
 }
@@ -35,7 +35,7 @@ public class DistributedFileStoreCacheOptions
     /// This defines which version of the <see cref="DistributedFileStoreCacheBytes"/> services are registered
     /// 1. Default is <see cref="IDistributedFileStoreCacheString"/>, where the value is of type string, plus two extra features
     /// 2. If set to <see cref="IDistributedFileStoreCacheBytes"/>, where the value is of type byte[], plus two extra features
-    /// 3. If set to <see cref="FileStoreCacheVersions.DistributedCache"/>, which implements the <see cref="IDistributedCache"/> interface
+    /// 3. If set to <see cref="FileStoreCacheVersions.IDistributedCache"/>, which implements the <see cref="IDistributedCache"/> interface
     /// </summary>
     public FileStoreCacheVersions WhichVersion { get; set; }
 
@@ -44,7 +44,7 @@ public class DistributedFileStoreCacheOptions
     /// 1. The default serialization creates one long line, which is efficient on space but hard to read.
     /// If you set this parameter to a <see cref="JsonSerializerOptions"/> containing { WriteIndented = true },
     /// then it takes up LOT more space but its easier to read.
-    /// 2. If you are using the <see cref="FileStoreCacheVersions.FileStoreCacheClasses"/> then this parameter to a
+    /// 2. If you are using the <see cref="FileStoreCacheVersions.Class"/> then this parameter to a
     /// <see cref="JsonSerializerOptions"/> containing { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping },
     /// then the json is easier to read.
     /// </summary>

@@ -28,7 +28,7 @@ public class TestIDistributedFileStoreCacheBytes
         var services = new ServiceCollection();
         _options = services.AddDistributedFileStoreCache(options =>
         {
-            options.WhichVersion = FileStoreCacheVersions.FileStoreCacheBytes;
+            options.WhichVersion = FileStoreCacheVersions.Bytes;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.JsonSerializerForCacheFile = new JsonSerializerOptions

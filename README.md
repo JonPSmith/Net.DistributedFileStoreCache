@@ -44,6 +44,7 @@ Summary of the write side is:
 
 - The time taken to add a cache value to cache goes up as the size of the cache is. This makes sense as unlike a database you 
 are reading and then writing ALL the cache values into a file.
+- The async versions are slower than the sync versions, but it does release a thread while reading and writing.
 
 |          Method | NumKeysAtStart |        Mean |     Error |    StdDev |
 |---------------- |--------------- |------------:|----------:|----------:|

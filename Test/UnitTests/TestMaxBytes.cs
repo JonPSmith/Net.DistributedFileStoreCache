@@ -26,7 +26,7 @@ public class TestMaxBytes
         var services = new ServiceCollection();
         services.AddDistributedFileStoreCache(options =>
         {
-            options.WhichVersion = FileStoreCacheVersions.FileStoreCacheStrings;
+            options.WhichVersion = FileStoreCacheVersions.String;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;

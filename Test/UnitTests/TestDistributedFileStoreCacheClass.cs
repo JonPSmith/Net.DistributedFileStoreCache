@@ -26,12 +26,15 @@ public class TestDistributedFileStoreCacheClass
         var services = new ServiceCollection();
         _options = services.AddDistributedFileStoreCache(options =>
         {
-            options.WhichVersion = FileStoreCacheVersions.FileStoreCacheClasses;
+            options.WhichVersion = FileStoreCacheVersions.Class;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;
             options.JsonSerializerForCacheFile = new JsonSerializerOptions
-                { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
         });
         var serviceProvider = services.BuildServiceProvider();
 
@@ -107,5 +110,7 @@ public class TestDistributedFileStoreCacheClass
         jsonClass2.MyClass1.MyString.ShouldEqual("Hello");
 
         _options.DisplayCacheFile(_output);
+        //Example if no UnsafeRelaxedJsonEscaping
+        //"{\u0022MyClass1\u0022:{\u0022MyInt\u0022:1,\u0022MyString\u0022:\u0022Hello\u0022},\u0022MyInt\u0022:3}"}
     }
 }

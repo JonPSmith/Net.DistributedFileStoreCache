@@ -37,16 +37,16 @@ public static class RegisterDistributedFileStoreCache
         // Add services to the container.
         switch (options.WhichVersion)
         {
-            case FileStoreCacheVersions.FileStoreCacheStrings:
+            case FileStoreCacheVersions.String:
                 services.AddSingleton<IDistributedFileStoreCacheString>(new DistributedFileStoreCacheString(options));
                 break;
-            case FileStoreCacheVersions.FileStoreCacheClasses:
+            case FileStoreCacheVersions.Class:
                 services.AddSingleton<IDistributedFileStoreCacheClass>(new DistributedFileStoreCacheClass(options));
                 break;
-            case FileStoreCacheVersions.FileStoreCacheBytes:
+            case FileStoreCacheVersions.Bytes:
                 services.AddSingleton<IDistributedFileStoreCacheBytes>(new DistributedFileStoreCacheBytes(new DistributedFileStoreCacheString(options)));
                 break;
-            case FileStoreCacheVersions.DistributedCache:
+            case FileStoreCacheVersions.IDistributedCache:
                 services.AddSingleton(new DistributedFileStoreCacheBytes(new DistributedFileStoreCacheString(options)) as IDistributedCache);
                 break;
             default:
