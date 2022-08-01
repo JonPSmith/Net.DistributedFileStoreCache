@@ -46,7 +46,7 @@ public class DistributedFileStoreCacheOptions
     /// then it takes up LOT more space but its easier to read.
     /// 2. If you are using the <see cref="FileStoreCacheVersions.FileStoreCacheClasses"/> then this parameter to a
     /// <see cref="JsonSerializerOptions"/> containing { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping },
-    /// then the json is smaller and easier to read.
+    /// then the json is easier to read.
     /// </summary>
     public JsonSerializerOptions JsonSerializerForCacheFile { get; set; } = new JsonSerializerOptions();
 

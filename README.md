@@ -25,8 +25,9 @@ Intel Core i9-9940X CPU 3.30GHz, 1 CPU, 28 logical and 14 physical cores
 
 Summary of the read side is:
 
-- Reads a single cache value took ~25 ns at all levels of of cache side tested.
-- Getting a Dictionary of ALL the cache key/values took ~80 ns at all levels of of cache side tested.
+- Reads a single cache value took ~25 ns at all levels of cache size evaluated at.
+- Getting a Dictionary of ALL the cache key/values took ~80 ns at all levels of cache size evaluated at.
+
 
 |          Method | NumKeysAtStart |        Mean |       Error |    StdDev |
 |---------------- |--------------- |------------:|------------:|----------:|
@@ -41,7 +42,7 @@ Summary of the read side is:
 
 Summary of the write side is:
 
-- Adding a cache value to cache goes up as the size of the cache is. This makes sense as unlike a database you 
+- The time taken to add a cache value to cache goes up as the size of the cache is. This makes sense as unlike a database you 
 are reading and then writing ALL the cache values into a file.
 
 |          Method | NumKeysAtStart |        Mean |     Error |    StdDev |
