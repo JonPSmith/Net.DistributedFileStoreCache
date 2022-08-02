@@ -30,11 +30,6 @@ public class TestDistributedFileStoreCacheClass
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
             options.TurnOffStaticFilePathCheck = true;
-            options.JsonSerializerForCacheFile = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            };
         });
         var serviceProvider = services.BuildServiceProvider();
 

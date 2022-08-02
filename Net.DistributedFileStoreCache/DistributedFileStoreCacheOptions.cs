@@ -70,15 +70,16 @@ public class DistributedFileStoreCacheOptions
 
     /// <summary>
     /// This allows you to replace the System.Text.Json default serialization options. Here are some reasons you might want to so this: 
-    /// 1. If you are using Unicode characters in the <see cref="FileStoreCacheVersions.String"/> version or the
-    /// <see cref="FileStoreCacheVersions.Class"/> then setting this parameter to a
+    /// 1. If you are using Unicode characters in the <see cref="FileStoreCacheVersions.String"/> version then set this parameter to
     /// <see cref="JsonSerializerOptions"/> containing { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping },
-    /// then the json smaller (and easier to read).
+    /// to make the Unicode smaller (and easier to read).
     /// 2. The default serialization creates one long line, which is efficient on space but hard to read.
     /// If you set this parameter to a <see cref="JsonSerializerOptions"/> containing { WriteIndented = true },
-    /// then it takes up LOT more space but its easier to read.
+    /// then it takes up LOT MORE SPACE so only use it to debug a problem but its easier to read.
+    /// NOTE: It you don's set this parameter will added, with the UnsafeRelaxedJsonEscaping if the <see cref="FileStoreCacheVersions.Class"/>
+    /// version is selected.
     /// </summary>
-    public JsonSerializerOptions JsonSerializerForCacheFile { get; set; } = new JsonSerializerOptions();
+    public JsonSerializerOptions? JsonSerializerForCacheFile { get; set; }
 
     /// <summary>
     /// This provides the path to the directory containing the cache file name

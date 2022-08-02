@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -37,6 +39,11 @@ public static class RegisterDistributedFileStoreCache
         optionsAction?.Invoke(options);
         options.PathToCacheFileDirectory ??= environment?.ContentRootPath;
         options.SecondPartOfCacheFileName ??= environment?.EnvironmentName;
+
+        options.JsonSerializerForCacheFile ??= options.WhichVersion == FileStoreCacheVersions.Class
+            // if the JsonSerializerForCacheFile isn't already set up and the version is Class, then add UnsafeRelaxedJsonEscaping
+            ? new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }
+            : new JsonSerializerOptions();
 
         if (options.PathToCacheFileDirectory == null)
             throw new DistributedFileStoreCacheException(
