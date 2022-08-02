@@ -1,8 +1,7 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
-using System.Text.Encodings.Web;
-using System.Text.Json;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
 using Test.TestHelpers;
@@ -31,8 +30,6 @@ public class TestIDistributedFileStoreCacheBytes
             options.WhichVersion = FileStoreCacheVersions.Bytes;
             options.PathToCacheFileDirectory = TestData.GetTestDataDir();
             options.SecondPartOfCacheFileName = GetType().Name;
-            options.JsonSerializerForCacheFile = new JsonSerializerOptions
-                { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
             options.TurnOffStaticFilePathCheck = true;
         });
         var serviceProvider = services.BuildServiceProvider();
@@ -69,6 +66,24 @@ public class TestIDistributedFileStoreCacheBytes
         var allValues = _distributedCache.GetAllKeyValues();
         allValues.Count.ShouldEqual(1);
         allValues["test"].ShouldEqual(new byte[] { 1, 2, 3 });
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSetAscci()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        var byteAscii = Encoding.ASCII.GetBytes("123");
+        _distributedCache.Set("test", byteAscii, null);
+
+        //VERIFY
+        var allValues = _distributedCache.GetAllKeyValues();
+        allValues.Count.ShouldEqual(1);
+        allValues["test"].ShouldEqual(byteAscii);
 
         _options.DisplayCacheFile(_output);
     }
