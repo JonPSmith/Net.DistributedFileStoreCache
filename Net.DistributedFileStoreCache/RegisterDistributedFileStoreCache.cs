@@ -8,8 +8,25 @@ using Net.DistributedFileStoreCache.SupportCode;
 
 namespace Net.DistributedFileStoreCache;
 
+/// <summary>
+/// This class contains the register / setup of the distributed FileStore cache
+/// </summary>
 public static class RegisterDistributedFileStoreCache
 {
+    /// <summary>
+    /// Use this to register the version of the distributed FileStore cache service you want.
+    /// It also ensures the cache json file is setup
+    /// </summary>
+    /// <param name="services">Needs the <see cref="IServiceCollection"/> to register the selected distributed FileStore cache version</param>
+    /// <param name="optionsAction">This allows to set up any of the properties in the <see cref="DistributedFileStoreCacheOptions"/> class</param>
+    /// <param name="environment">Optional: If provided it sets the <see cref="DistributedFileStoreCacheOptions.PathToCacheFileDirectory"/> property
+    /// from the <see cref="IHostEnvironment.ContentRootPath"/> and the <see cref="DistributedFileStoreCacheOptions.SecondPartOfCacheFileName"/> property
+    /// from the <see cref="IHostEnvironment.EnvironmentName"/> property.
+    /// </param>
+    /// <returns><see cref="DistributedFileStoreCacheOptions"/>, which is useful in unit testing.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="DistributedFileStoreCacheException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public static DistributedFileStoreCacheOptions AddDistributedFileStoreCache(this IServiceCollection services,
         Action<DistributedFileStoreCacheOptions>? optionsAction = null,
         IHostEnvironment? environment = null)

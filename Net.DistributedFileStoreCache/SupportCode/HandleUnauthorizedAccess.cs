@@ -3,6 +3,9 @@
 
 namespace Net.DistributedFileStoreCache.SupportCode;
 
+/// <summary>
+/// This contains extension methods to retry on certain exceptions
+/// </summary>
 public static class HandleUnauthorizedAccess
 {
     /// <summary>
@@ -29,7 +32,7 @@ public static class HandleUnauthorizedAccess
                     throw new DistributedFileStoreCacheException(
                         "A file lock stopped this action for " +
                         $"{fileStoreCacheOptions.DelayMillisecondsOnUnauthorizedAccess * fileStoreCacheOptions.NumTriesOnUnauthorizedAccess:N0} milliseconds," +
-                        "which is longer that the settings allow.",
+                        " which is longer that the settings allow.",
                         e);
                 Thread.Sleep(fileStoreCacheOptions.DelayMillisecondsOnUnauthorizedAccess);
             }
@@ -39,7 +42,7 @@ public static class HandleUnauthorizedAccess
                     throw new DistributedFileStoreCacheException(
                         "Another process stopped access for " +
                         $"{fileStoreCacheOptions.DelayMillisecondsOnUnauthorizedAccess * fileStoreCacheOptions.NumTriesOnUnauthorizedAccess:N0} milliseconds," +
-                        "which is longer that the settings allow.",
+                        " which is longer that the settings allow.",
                         e);
                 Thread.Sleep(fileStoreCacheOptions.DelayMillisecondsOnUnauthorizedAccess);
             }
@@ -49,7 +52,7 @@ public static class HandleUnauthorizedAccess
                     throw new DistributedFileStoreCacheException(
                         "There was a problem on accessing the cache file for " +
                         $"{fileStoreCacheOptions.DelayMillisecondsOnUnauthorizedAccess * fileStoreCacheOptions.NumTriesOnUnauthorizedAccess:N0} milliseconds," +
-                        "which is longer that the settings allow.",
+                        " which is longer that the settings allow.",
                         e);
                 Thread.Sleep(fileStoreCacheOptions.DelayMillisecondsOnUnauthorizedAccess);
             }

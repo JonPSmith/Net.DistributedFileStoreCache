@@ -8,17 +8,27 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace Net.DistributedFileStoreCache.SupportCode;
 
 /// <summary>
-/// This class should be internal, but you can't use protected internal in a public class.
+/// This class contains all the code that accesses the local static cache and the json cache file.
+/// This class should be internal, but you can't use protected in a public class.
 /// </summary>
 public class CacheFileHandler
 {
     private readonly DistributedFileStoreCacheOptions _options;
 
+    /// <summary>
+    /// ctor
+    /// </summary>
+    /// <param name="options"></param>
     public CacheFileHandler (DistributedFileStoreCacheOptions options)
     {
         _options = options;
     }
 
+    /// <summary>
+    /// This handles the Get
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public string? GetValue(string key)
     {
         if (StaticCachePart.LocalCacheIsOutOfDate)
@@ -27,6 +37,12 @@ public class CacheFileHandler
         return StaticCachePart.CacheContent.ReturnNullIfExpires(key);
     }
 
+    /// <summary>
+    /// This handles the GetAsync
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     public async Task<string?> GetValueAsync(string key, CancellationToken token)
     {
         if (StaticCachePart.LocalCacheIsOutOfDate)
@@ -35,6 +51,10 @@ public class CacheFileHandler
         return StaticCachePart.CacheContent.ReturnNullIfExpires(key);
     }
 
+    /// <summary>
+    /// This handles the GetAllValues 
+    /// </summary>
+    /// <returns></returns>
     public IReadOnlyDictionary<string, string> GetAllValues()
     {
         if (StaticCachePart.LocalCacheIsOutOfDate)
@@ -43,6 +63,11 @@ public class CacheFileHandler
         return StaticCachePart.CacheContent.ReturnNonExpiredCacheValues();
     }
 
+    /// <summary>
+    /// This handles the GetAllValuesAsync 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
     public async Task<IReadOnlyDictionary<string, string>> GetAllValuesAsync(CancellationToken token)
     {
         if (StaticCachePart.LocalCacheIsOutOfDate)
@@ -51,6 +76,12 @@ public class CacheFileHandler
         return StaticCachePart.CacheContent.ReturnNonExpiredCacheValues();
     }
 
+    /// <summary>
+    /// This handles the Set
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <param name="entryOptions"></param>
     public void SetKeyValue(string key, string value, DistributedCacheEntryOptions? entryOptions)
     {
         _options.TryAgainOnUnauthorizedAccess(() =>
@@ -58,6 +89,14 @@ public class CacheFileHandler
                 .CheckSyncValueTaskWorked());
     }
 
+    /// <summary>
+    /// This handles the SetAsync
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <param name="entryOptions"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     public async Task SetKeyValueAsync(string key, string value, DistributedCacheEntryOptions? entryOptions,
         CancellationToken token)
     {
@@ -65,6 +104,10 @@ public class CacheFileHandler
             await ReadAndChangeCacheJsonFile(CacheChanges.Add, true, key, value, entryOptions, token));
     }
 
+    /// <summary>
+    /// This handles the Remove
+    /// </summary>
+    /// <param name="key"></param>
     public void RemoveKeyValue(string key)
     {
         _options.TryAgainOnUnauthorizedAccess(() =>
@@ -72,12 +115,21 @@ public class CacheFileHandler
                 .CheckSyncValueTaskWorked());
     }
 
+    /// <summary>
+    /// This handles the RemoveAsync
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     public async Task RemoveKeyValueAsync(string key, CancellationToken token)
     {
         await _options.TryAgainOnUnauthorizedAccessAsync(async () =>
             await ReadAndChangeCacheJsonFile(CacheChanges.Remove, false, key, token: token));
     }
 
+    /// <summary>
+    /// This handles the ClearAll
+    /// </summary>
     public void ResetCacheFile()
     {
         _options.TryAgainOnUnauthorizedAccess(() =>

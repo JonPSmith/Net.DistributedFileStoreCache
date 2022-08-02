@@ -5,6 +5,9 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Net.DistributedFileStoreCache;
 
+/// <summary>
+/// Interface for the String FileStore cache version
+/// </summary>
 public interface IDistributedFileStoreCacheString
 {
     /// <summary>Gets a value with the given key.</summary>

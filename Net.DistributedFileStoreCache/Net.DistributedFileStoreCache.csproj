@@ -4,6 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -13,6 +14,30 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<PackageId>Net.DistributedFileStoreCache</PackageId>
+		<PackageVersion>1.0.0-preview001</PackageVersion>
+		<Authors>Jon P Smith</Authors>
+		<Description>This provides .NET distributed cache using a json file as the shared resourse.</Description>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>
+			First release
+		</PackageReleaseNotes>
+		<Copyright>Copyright (c) 2022 Jon P Smith. Licenced under MIT licence</Copyright>
+		<PackageTags>Distributed cache</PackageTags>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<ProjectUrl>https://github.com/JonPSmith/Net.DistributedFileStoreCache</ProjectUrl>
+		<RepositoryUrl>https://github.com/JonPSmith/Net.DistributedFileStoreCache</RepositoryUrl>
+		<PackageIcon>DistributedFileStoreCacheNuGetIcon.png</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<None Include="DistributedFileStoreCacheNuGetIcon.png" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>

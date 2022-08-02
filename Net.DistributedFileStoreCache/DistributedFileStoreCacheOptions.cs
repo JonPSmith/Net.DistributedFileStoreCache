@@ -7,6 +7,9 @@ using Microsoft.Extensions.Hosting;
 
 namespace Net.DistributedFileStoreCache;
 
+/// <summary>
+/// This provides the members to select which version of the FileStore cache class / interface you want registers as a service
+/// </summary>
 public enum FileStoreCacheVersions
 {
     /// <summary>
@@ -14,7 +17,7 @@ public enum FileStoreCacheVersions
     /// </summary>
     String,
     /// <summary>
-    /// Use this to register the <see cref="DistributedFileStoreCacheClass"/> against the <see cref="IDistributedFileStoreCacheClasses"/> interface
+    /// Use this to register the <see cref="DistributedFileStoreCacheClass"/> against the <see cref="IDistributedFileStoreCacheClass"/> interface
     /// </summary>
     Class,
     /// <summary>
@@ -24,11 +27,13 @@ public enum FileStoreCacheVersions
     /// <summary>
     /// Use this to register the <see cref="DistributedFileStoreCacheBytes"/> against the <see cref="Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> interface
     /// </summary>
-    IDistributedCache,
-
-
+    // ReSharper disable once InconsistentNaming
+    IDistributedCache
 }
 
+/// <summary>
+/// This contains all the options used to register / setup the FileStore cache
+/// </summary>
 public class DistributedFileStoreCacheOptions
 {
     /// <summary>

@@ -1,9 +1,10 @@
-﻿
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
 using TestSupport.Helpers;
+
+namespace ConsoleBenchmark;
 
 public class ConsoleBenchmark
 {

@@ -5,6 +5,9 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Net.DistributedFileStoreCache;
 
+/// <summary>
+/// Interface for the Class FileStore cache version. Note that it also inherits the <see cref="IDistributedFileStoreCacheString"/> interface.
+/// </summary>
 public interface IDistributedFileStoreCacheClass : IDistributedFileStoreCacheString
 {
     /// <summary>

@@ -6,10 +6,17 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Net.DistributedFileStoreCache;
 
+/// <summary>
+/// This is the Distributed FileStore cache that has a value of type byte[]
+/// </summary>
 public class DistributedFileStoreCacheBytes : IDistributedFileStoreCacheBytes
 {
     private readonly IDistributedFileStoreCacheString _stringCache;
 
+    /// <summary>
+    /// ctor
+    /// </summary>
+    /// <param name="stringCache"></param>
     public DistributedFileStoreCacheBytes(IDistributedFileStoreCacheString stringCache)
     {
         _stringCache = stringCache;
@@ -119,6 +126,10 @@ public class DistributedFileStoreCacheBytes : IDistributedFileStoreCacheBytes
         return stringByteDictionary;
     }
 
+    /// <summary>
+    /// This return all the cached values as a dictionary, async
+    /// </summary>
+    /// <returns></returns>
     public async Task<IReadOnlyDictionary<string, byte[]>> GetAllKeyValuesAsync()
     {
         var stringValues = await _stringCache.GetAllKeyValuesAsync();

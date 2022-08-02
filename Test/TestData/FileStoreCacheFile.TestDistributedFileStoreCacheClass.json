@@ -1,0 +1,6 @@
+{
+  "Cache": {
+    "test": "{\"MyInt\":1,\"MyString\":\"Hello\"}"
+  },
+  "TimeOuts": {}
+}

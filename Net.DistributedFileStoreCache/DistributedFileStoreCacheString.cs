@@ -6,13 +6,24 @@ using Net.DistributedFileStoreCache.SupportCode;
 
 namespace Net.DistributedFileStoreCache;
 
+/// <summary>
+/// This is the Distributed FileStore cache that has a value of type string.
+/// This is the primary FileStore cache version that the other versions link to this class
+/// </summary>
 public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
 {
-    protected internal readonly CacheFileHandler _cacheFileHandler;
+    /// <summary>
+    /// This class directly creates the <see cref="CacheFileHandler"/> which provides read/write access of the cache json file
+    /// </summary>
+    protected readonly CacheFileHandler CacheFileHandler;
 
+    /// <summary>
+    /// ctor
+    /// </summary>
+    /// <param name="fileStoreCacheOptions"></param>
     public DistributedFileStoreCacheString(DistributedFileStoreCacheOptions fileStoreCacheOptions)
     {
-        _cacheFileHandler = new CacheFileHandler(fileStoreCacheOptions);
+        CacheFileHandler = new CacheFileHandler(fileStoreCacheOptions);
     }
 
     /// <summary>Gets a value with the given key.</summary>
@@ -20,7 +31,7 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     /// <returns>The located value or null.</returns>
     public string? Get(string key)
     {
-        return _cacheFileHandler.GetValue(key);
+        return CacheFileHandler.GetValue(key);
     }
 
     /// <summary>Gets a value with the given key.</summary>
@@ -29,7 +40,7 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation, containing the located value or null.</returns>
     public Task<string?> GetAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.GetValueAsync(key, token);
+        return CacheFileHandler.GetValueAsync(key, token);
     }
 
     /// <summary>Sets a value with the given key.</summary>
@@ -38,7 +49,7 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     /// <param name="options">The cache options for the value.</param>
     public void Set(string key, string value, DistributedCacheEntryOptions? options)
     {
-        _cacheFileHandler.SetKeyValue(key, value, options);
+        CacheFileHandler.SetKeyValue(key, value, options);
     }
 
     /// <summary>Sets the value with the given key.</summary>
@@ -50,14 +61,14 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     public Task SetAsync(string key, string value, DistributedCacheEntryOptions? options,
         CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.SetKeyValueAsync(key, value, options, token);
+        return CacheFileHandler.SetKeyValueAsync(key, value, options, token);
     }
 
     /// <summary>Removes the value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     public void Remove(string key)
     {
-        _cacheFileHandler.RemoveKeyValue(key);
+        CacheFileHandler.RemoveKeyValue(key);
     }
 
     /// <summary>Removes the value with the given key.</summary>
@@ -66,7 +77,7 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
     public Task RemoveAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.RemoveKeyValueAsync(key, token);
+        return CacheFileHandler.RemoveKeyValueAsync(key, token);
     }
 
     /// <summary>
@@ -74,7 +85,7 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     /// </summary>
     public void ClearAll()
     {
-        _cacheFileHandler.ResetCacheFile();
+        CacheFileHandler.ResetCacheFile();
     }
 
     /// <summary>
@@ -83,7 +94,7 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     /// <returns></returns>
     public IReadOnlyDictionary<string, string> GetAllKeyValues()
     {
-        return _cacheFileHandler.GetAllValues();
+        return CacheFileHandler.GetAllValues();
     }
 
     /// <summary>
@@ -92,6 +103,6 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     /// <returns></returns>
     public Task<IReadOnlyDictionary<string, string>> GetAllKeyValuesAsync(CancellationToken token = new CancellationToken())
     {
-        return _cacheFileHandler.GetAllValuesAsync(token);
+        return CacheFileHandler.GetAllValuesAsync(token);
     }
 }

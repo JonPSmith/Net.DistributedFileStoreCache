@@ -6,9 +6,15 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Net.DistributedFileStoreCache;
 
+/// <summary>
+/// This adds methods to serialize / deserialize classes into a string which is saved as a json string
+/// </summary>
 public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, IDistributedFileStoreCacheClass
 {
-
+    /// <summary>
+    /// ctor
+    /// </summary>
+    /// <param name="fileStoreCacheOptions"></param>
     public DistributedFileStoreCacheClass(DistributedFileStoreCacheOptions fileStoreCacheOptions)
         : base(fileStoreCacheOptions) { }
 
@@ -31,7 +37,7 @@ public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, I
     /// <returns>The deserialize class or null.</returns>
     public T? GetClass<T>(string key) where T : class, new()
     {
-        var stringValue = _cacheFileHandler.GetValue(key);
+        var stringValue = CacheFileHandler.GetValue(key);
         return stringValue == null ? null : JsonSerializer.Deserialize<T>(stringValue);
     }
 
@@ -42,7 +48,7 @@ public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, I
     /// <returns>The located class or null withing a Task result.</returns>
     public async Task<T?> GetClassAsync<T>(string key, CancellationToken token = new CancellationToken()) where T : class, new()
     {
-        var stringValue = await _cacheFileHandler.GetValueAsync(key, token);
+        var stringValue = await CacheFileHandler.GetValueAsync(key, token);
         return stringValue == null ? null : JsonSerializer.Deserialize<T>(stringValue);
     }
 
@@ -54,7 +60,7 @@ public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, I
     public void SetClass<T>(string key, T yourClass, DistributedCacheEntryOptions? options) where T : class, new()
     {
         var jsonString = JsonSerializer.Serialize<T>(yourClass);
-        _cacheFileHandler.SetKeyValue(key, jsonString, options);
+        CacheFileHandler.SetKeyValue(key, jsonString, options);
     }
 
     /// <summary>Serializers the class and stores the json against the given key.</summary>
@@ -67,6 +73,6 @@ public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, I
         CancellationToken token = new CancellationToken()) where T : class, new()
     {
         var jsonString = JsonSerializer.Serialize<T>(yourClass);
-        return _cacheFileHandler.SetKeyValueAsync(key, jsonString, options, token);
+        return CacheFileHandler.SetKeyValueAsync(key, jsonString, options, token);
     }
 }
