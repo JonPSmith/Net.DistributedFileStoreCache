@@ -84,6 +84,25 @@ public class TestDistributedFileStoreCacheClass
     }
 
     [Fact]
+    public void DistributedFileStoreCacheSetClass_Unicode()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+        var unicode = "בָּרוּךְ אַתָּה ה' אֱ-לֹהֵינוּ, מֶלֶך הָעוֹלָם";
+
+        //ATTEMPT
+        _distributedCache.SetClass("test", new JsonClass1 { MyInt = 1, MyString = unicode } , null);
+
+        //VERIFY
+        var allValues = _distributedCache.GetAllKeyValues();
+        allValues.Count.ShouldEqual(1);
+        allValues["test"].ShouldEqual("{\"MyInt\":1,\"MyString\":\"" + unicode + "\"}");
+
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
     public void DistributedFileStoreCacheSetClass_JsonClass_Example()
     {
         //SETUP

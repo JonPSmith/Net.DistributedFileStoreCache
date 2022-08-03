@@ -11,12 +11,17 @@ namespace Net.DistributedFileStoreCache;
 /// </summary>
 public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, IDistributedFileStoreCacheClass
 {
+    private readonly DistributedFileStoreCacheOptions _options;
+
     /// <summary>
     /// ctor
     /// </summary>
-    /// <param name="fileStoreCacheOptions"></param>
-    public DistributedFileStoreCacheClass(DistributedFileStoreCacheOptions fileStoreCacheOptions)
-        : base(fileStoreCacheOptions) { }
+    /// <param name="options"></param>
+    public DistributedFileStoreCacheClass(DistributedFileStoreCacheOptions options)
+        : base(options)
+    {
+        _options = options;
+    }
 
     /// <summary>
     /// This method is useful if you want to decode a cache value via the <see cref="DistributedFileStoreCacheString.GetAllKeyValues"/>
@@ -59,7 +64,7 @@ public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, I
     /// <typeparam name="T">A class which can be created</typeparam>
     public void SetClass<T>(string key, T yourClass, DistributedCacheEntryOptions? options) where T : class, new()
     {
-        var jsonString = JsonSerializer.Serialize<T>(yourClass);
+        var jsonString = JsonSerializer.Serialize(yourClass, _options.JsonSerializerForCacheFile);
         CacheFileHandler.SetKeyValue(key, jsonString, options);
     }
 
@@ -72,7 +77,7 @@ public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, I
     public Task SetClassAsync<T>(string key, T yourClass, DistributedCacheEntryOptions? options,
         CancellationToken token = new CancellationToken()) where T : class, new()
     {
-        var jsonString = JsonSerializer.Serialize<T>(yourClass);
+        var jsonString = JsonSerializer.Serialize(yourClass, _options.JsonSerializerForCacheFile);
         return CacheFileHandler.SetKeyValueAsync(key, jsonString, options, token);
     }
 }

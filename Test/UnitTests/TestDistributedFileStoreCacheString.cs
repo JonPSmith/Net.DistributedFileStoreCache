@@ -82,12 +82,16 @@ public class TestDistributedFileStoreCacheString
         //ATTEMPT
         var unicode = "בָּרוּךְ אַתָּה ה' אֱ-לֹהֵינוּ, מֶלֶך הָעוֹלָם";
         _distributedCache.Set("Unicode", unicode, null);
+        var nonChars = new string(new[] { (char)1, (char)2, (char)3 });
+        _distributedCache.Set("non-chars", nonChars, null);
         _distributedCache.Set("ascii", "my ascii", null);
+
 
         //VERIFY
         var allValues = _distributedCache.GetAllKeyValues();
         allValues.Count.ShouldEqual(2);
         allValues["Unicode"].ShouldEqual(unicode);
+        allValues["non-chars"].ShouldEqual(nonChars);
         allValues["ascii"].ShouldEqual("my ascii");
 
         _options.DisplayCacheFile(_output);
