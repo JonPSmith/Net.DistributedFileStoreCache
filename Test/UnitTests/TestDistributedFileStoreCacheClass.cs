@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2022 Jon P Smith, GitHub: JonPSmith, web: http://www.thereformedprogrammer.net/
 // Licensed under MIT license. See License.txt in the project root for license information.
 
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Net.DistributedFileStoreCache;
 using Test.TestHelpers;
@@ -15,7 +13,7 @@ namespace Test.UnitTests;
 
 public class TestDistributedFileStoreCacheClass
 {
-    private readonly IDistributedFileStoreCacheClass _distributedCache;
+    private readonly IDistributedFileStoreCacheClass _fsCache;
     private readonly DistributedFileStoreCacheOptions _options;
     private readonly ITestOutputHelper _output;
 
@@ -33,7 +31,7 @@ public class TestDistributedFileStoreCacheClass
         });
         var serviceProvider = services.BuildServiceProvider();
 
-        _distributedCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheClass>();
+        _fsCache = serviceProvider.GetRequiredService<IDistributedFileStoreCacheClass>();
     }
 
     private class JsonClass1
@@ -45,20 +43,20 @@ public class TestDistributedFileStoreCacheClass
     private class JsonClass2
     {
         public JsonClass1 MyClass1 { get; set; }
-        public int MyInt { get; set; }
+        public int MyInt2 { get; set; }
     }
 
     [Fact]
-    public void DistributedFileStoreCacheSetClass_JsonClass1()
+    public void DistributedFileStoreCacheSetClass_SetJsonClass1()
     {
         //SETUP
-        _distributedCache.ClearAll();
+        _fsCache.ClearAll();
 
         //ATTEMPT
-        _distributedCache.SetClass("test", new JsonClass1{MyInt = 1, MyString = "Hello"}, null);
+        _fsCache.SetClass("test", new JsonClass1{MyInt = 1, MyString = "Hello"});
 
         //VERIFY
-        var allValues = _distributedCache.GetAllKeyValues();
+        var allValues = _fsCache.GetAllKeyValues();
         allValues.Count.ShouldEqual(1);
         allValues["test"].ShouldEqual("{\"MyInt\":1,\"MyString\":\"Hello\"}");
 
@@ -66,18 +64,72 @@ public class TestDistributedFileStoreCacheClass
     }
 
     [Fact]
+    public void DistributedFileStoreCacheSetClass_GetClassFromStringJsonClass1()
+    {
+        //SETUP
+        _fsCache.ClearAll();
+        _fsCache.SetClass("test", new JsonClass1 { MyInt = 1, MyString = "Hello" });
+
+        //ATTEMPT
+        var allValuesDict = _fsCache.GetAllKeyValues();
+        var jsonClass1 = _fsCache.GetClassFromString<JsonClass1>(allValuesDict ["test"]);
+
+        //VERIFY
+        jsonClass1.ShouldBeType<JsonClass1>();
+        jsonClass1.ShouldNotBeNull();
+        jsonClass1.MyInt.ShouldEqual(1);
+        jsonClass1.MyString.ShouldEqual("Hello");
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSetClass_GetJsonClass1()
+    {
+        //SETUP
+        _fsCache.ClearAll();
+        _fsCache.SetClass("test", new JsonClass1 { MyInt = 1, MyString = "Hello" });
+
+        //ATTEMPT
+        var jsonClass1 = _fsCache.GetClass<JsonClass1>("test");
+
+        //VERIFY
+        jsonClass1.ShouldBeType<JsonClass1>();
+        jsonClass1.ShouldNotBeNull();
+        jsonClass1.MyInt.ShouldEqual(1);
+        jsonClass1.MyString.ShouldEqual("Hello");
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSetClass_Bad()
+    {
+        //SETUP
+        _fsCache.ClearAll();
+        _fsCache.SetClass("test", new JsonClass1 { MyInt = 1, MyString = "Hello" });
+
+        //ATTEMPT
+        var jsonClass2 = _fsCache.GetClass<JsonClass2>("test");
+
+        //VERIFY
+        jsonClass2.ShouldBeType<JsonClass2>();
+        jsonClass2.ShouldNotBeNull();
+        jsonClass2.MyInt2.ShouldEqual(default);
+        jsonClass2.MyClass1.ShouldEqual(null);
+    }
+
+    [Fact]
     public void DistributedFileStoreCacheSetClass_JsonClass2()
     {
         //SETUP
-        _distributedCache.ClearAll();
+        _fsCache.ClearAll();
 
         //ATTEMPT
-        _distributedCache.SetClass("test", new JsonClass2 { MyInt = 3, MyClass1 = new JsonClass1{ MyInt = 1, MyString = "Hello" } }, null);
+        _fsCache.SetClass("test", new JsonClass2 { MyInt2 = 3, MyClass1 = new JsonClass1{ MyInt = 1, MyString = "Hello" } });
 
         //VERIFY
-        var allValues = _distributedCache.GetAllKeyValues();
+        var allValues = _fsCache.GetAllKeyValues();
         allValues.Count.ShouldEqual(1);
-        allValues["test"].ShouldEqual("{\"MyClass1\":{\"MyInt\":1,\"MyString\":\"Hello\"},\"MyInt\":3}");
+        allValues["test"].ShouldEqual("{\"MyClass1\":{\"MyInt\":1,\"MyString\":\"Hello\"},\"MyInt2\":3}");
 
 
         _options.DisplayCacheFile(_output);
@@ -87,14 +139,14 @@ public class TestDistributedFileStoreCacheClass
     public void DistributedFileStoreCacheSetClass_Unicode()
     {
         //SETUP
-        _distributedCache.ClearAll();
+        _fsCache.ClearAll();
         var unicode = "בָּרוּךְ אַתָּה ה' אֱ-לֹהֵינוּ, מֶלֶך הָעוֹלָם";
 
         //ATTEMPT
-        _distributedCache.SetClass("test", new JsonClass1 { MyInt = 1, MyString = unicode } , null);
+        _fsCache.SetClass("test", new JsonClass1 { MyInt = 1, MyString = unicode });
 
         //VERIFY
-        var allValues = _distributedCache.GetAllKeyValues();
+        var allValues = _fsCache.GetAllKeyValues();
         allValues.Count.ShouldEqual(1);
         allValues["test"].ShouldEqual("{\"MyInt\":1,\"MyString\":\"" + unicode + "\"}");
 
@@ -106,19 +158,19 @@ public class TestDistributedFileStoreCacheClass
     public void DistributedFileStoreCacheSetClass_JsonClass_Example()
     {
         //SETUP
-        _distributedCache.ClearAll();
+        _fsCache.ClearAll();
 
         //ATTEMPT
-        _distributedCache.SetClass("test", new JsonClass2 { MyInt = 3, 
-            MyClass1 = new JsonClass1 { MyInt = 1, MyString = "Hello" } }, null);
+        _fsCache.SetClass("test", new JsonClass2 { MyInt2 = 3, 
+            MyClass1 = new JsonClass1 { MyInt = 1, MyString = "Hello" } });
 
         //VERIFY
-        _distributedCache.Get("test").ShouldEqual(
-            "{\"MyClass1\":{\"MyInt\":1,\"MyString\":\"Hello\"},\"MyInt\":3}");
-        var jsonClass2 = _distributedCache.GetClass<JsonClass2>("test");
+        _fsCache.Get("test").ShouldEqual(
+            "{\"MyClass1\":{\"MyInt\":1,\"MyString\":\"Hello\"},\"MyInt2\":3}");
+        var jsonClass2 = _fsCache.GetClass<JsonClass2>("test");
         jsonClass2.ShouldBeType<JsonClass2>();
         jsonClass2.ShouldNotBeNull();
-        jsonClass2.MyInt.ShouldEqual(3);
+        jsonClass2.MyInt2.ShouldEqual(3);
         jsonClass2.MyClass1.ShouldNotBeNull();
         jsonClass2.MyClass1.MyInt.ShouldEqual(1);
         jsonClass2.MyClass1.MyString.ShouldEqual("Hello");

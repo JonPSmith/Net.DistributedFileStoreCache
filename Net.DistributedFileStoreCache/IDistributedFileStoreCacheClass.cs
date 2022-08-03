@@ -37,7 +37,7 @@ public interface IDistributedFileStoreCacheClass : IDistributedFileStoreCacheStr
     /// <param name="yourClass">The class that you wanted to be stored in the cache.</param>
     /// <param name="options">The cache options for the value.</param>
     /// <typeparam name="T">A class which can be created</typeparam>
-    void SetClass<T>(string key, T yourClass, DistributedCacheEntryOptions? options) where T : class, new();
+    void SetClass<T>(string key, T yourClass, DistributedCacheEntryOptions? options = null) where T : class, new();
 
     /// <summary>Serializers the class and stores the json against the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
@@ -45,6 +45,6 @@ public interface IDistributedFileStoreCacheClass : IDistributedFileStoreCacheStr
     /// <param name="options">The cache options for the value.</param>
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
     /// <typeparam name="T">A class which can be created</typeparam>
-    Task SetClassAsync<T>(string key, T yourClass, DistributedCacheEntryOptions? options,
+    Task SetClassAsync<T>(string key, T yourClass, DistributedCacheEntryOptions? options = null,
         CancellationToken token = new CancellationToken()) where T : class, new();
 }
