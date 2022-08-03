@@ -45,7 +45,7 @@ public class TestDistributedFileStoreCacheString_Async
         _distributedCache.ClearAll();
 
         //ATTEMPT
-        await _distributedCache.SetAsync("test", "hello async", null);
+        await _distributedCache.SetAsync("test", "hello async");
 
         //VERIFY
         var value = await _distributedCache.GetAsync("test");
@@ -112,7 +112,7 @@ public class TestDistributedFileStoreCacheString_Async
         //ATTEMPT
         try
         {
-            await _distributedCache.SetAsync("test", null, null);
+            await _distributedCache.SetAsync("test", null);
         }
         catch (NullReferenceException)
         {
@@ -130,9 +130,9 @@ public class TestDistributedFileStoreCacheString_Async
         _distributedCache.ClearAll();
 
         //ATTEMPT
-        await _distributedCache.SetAsync("test", "first", null);
+        await _distributedCache.SetAsync("test", "first");
         _options.DisplayCacheFile(_output);
-        await _distributedCache.SetAsync("test", "second", null);
+        await _distributedCache.SetAsync("test", "second");
         _options.DisplayCacheFile(_output);
 
         //VERIFY
@@ -147,8 +147,8 @@ public class TestDistributedFileStoreCacheString_Async
     {
         //SETUP
         _distributedCache.ClearAll();
-        await _distributedCache.SetAsync("YYY", "another to go", null);
-        await _distributedCache.SetAsync("Still there", "keep this", null);
+        await _distributedCache.SetAsync("YYY", "another to go");
+        await _distributedCache.SetAsync("Still there", "keep this");
 
         //ATTEMPT
         await _distributedCache.RemoveAsync("YYY");
@@ -167,8 +167,8 @@ public class TestDistributedFileStoreCacheString_Async
         _distributedCache.ClearAll();
 
         //ATTEMPT
-        await _distributedCache.SetAsync("test1", "first", null);
-        await _distributedCache.SetAsync("test2", "second", null);
+        await _distributedCache.SetAsync("test1", "first");
+        await _distributedCache.SetAsync("test2", "second");
 
         //VERIFY
         var allValues = await _distributedCache.GetAllKeyValuesAsync();
@@ -189,7 +189,7 @@ public class TestDistributedFileStoreCacheString_Async
         for (int i = 0; i < 10; i++)
         {
             _distributedCache.ClearAll();
-            await _distributedCache.SetAsync($"test{i}", i.ToString(), null);
+            await _distributedCache.SetAsync($"test{i}", i.ToString());
             _distributedCache.Get($"test{i}").ShouldEqual(i.ToString());
         }
 

@@ -54,12 +54,14 @@ public class DistributedFileStoreCacheOptions
     /// If you want to set the maximum bytes that the cache can hold then you can use this calculation
     /// </summary>
     /// <param name="maxEntries">The maximum number of cache entries you want to add to the cache</param>
-    /// <param name="maxKeyLength">The maximum size of the key string</param>
+    /// <param name="maxKeyLength">The maximum size of the key string. ASSUMES ASCII characters - increase if Unicode</param>
     /// <param name="maxValueLength">The maximum size of the value string</param>
     /// <param name="charSize">Optional:
-    /// If ascii = 1, if byte or unicode and not using UnsafeRelaxedJsonEscaping then 6, if unicode with UnsafeRelaxedJsonEscaping then 2 </param>
+    /// If ascii = 1, if unicode and not using UnsafeRelaxedJsonEscaping then 6, 
+    /// if unicode with UnsafeRelaxedJsonEscaping then 2,
+    /// if not UTF8 character the 6</param>
     /// <param name="percentWithTimeout">Optional: the percent (between 0 and 100) of the entries will have a timeout</param>
-    public void SetMaxBytesByCalculation(int maxEntries, int maxKeyLength, int maxValueLength, int charSize = 1, double percentWithTimeout = 0)
+    public void SetMaxBytesByCalculation(int maxEntries, int maxKeyLength, int maxValueLength, int charSize = 1, int percentWithTimeout = 0)
     {
         maxValueLength *= charSize ;
         MaxBytesInJsonCacheFile = maxEntries * (maxKeyLength + maxValueLength + 6) + 15 + 14;

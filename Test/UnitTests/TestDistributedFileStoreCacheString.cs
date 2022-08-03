@@ -63,7 +63,7 @@ public class TestDistributedFileStoreCacheString
         _distributedCache.ClearAll();
 
         //ATTEMPT
-        _distributedCache.Set("test", "goodbye", null);
+        _distributedCache.Set("test", "goodbye");
 
         //VERIFY
         var allValues = _distributedCache.GetAllKeyValues();
@@ -81,15 +81,15 @@ public class TestDistributedFileStoreCacheString
 
         //ATTEMPT
         var unicode = "בָּרוּךְ אַתָּה ה' אֱ-לֹהֵינוּ, מֶלֶך הָעוֹלָם";
-        _distributedCache.Set("Unicode", unicode, null);
+        _distributedCache.Set("Unicode", unicode);
         var nonChars = new string(new[] { (char)1, (char)2, (char)3 });
-        _distributedCache.Set("non-chars", nonChars, null);
-        _distributedCache.Set("ascii", "my ascii", null);
+        _distributedCache.Set("non-chars", nonChars);
+        _distributedCache.Set("ascii", "my ascii");
 
 
         //VERIFY
         var allValues = _distributedCache.GetAllKeyValues();
-        allValues.Count.ShouldEqual(2);
+        allValues.Count.ShouldEqual(3);
         allValues["Unicode"].ShouldEqual(unicode);
         allValues["non-chars"].ShouldEqual(nonChars);
         allValues["ascii"].ShouldEqual("my ascii");
@@ -151,7 +151,7 @@ public class TestDistributedFileStoreCacheString
         //ATTEMPT
         try
         {
-            _distributedCache.Set("test", null, null);
+            _distributedCache.Set("test", null);
         }
         catch (NullReferenceException)
         {
@@ -169,14 +169,14 @@ public class TestDistributedFileStoreCacheString
         _distributedCache.ClearAll();
 
         //ATTEMPT
-        _distributedCache.Set("test", "first", null);
+        _distributedCache.Set("test", "first");
         _options.DisplayCacheFile(_output);
-        _distributedCache.Set("test", "second", null);
+        _distributedCache.Set("test", "second");
         _options.DisplayCacheFile(_output);
 
         //VERIFY
         _output.WriteLine("------------------------------");
-        _output.WriteLine(string.Join(", ", _distributedCache.Get("test").Select(x => (int)x)));
+        _output.WriteLine(string.Join(", ", _distributedCache.Get("test")!.Select(x => (int)x)));
         var value = _distributedCache.Get("test");
         value.ShouldEqual("second");
         var allValues = _distributedCache.GetAllKeyValues();
@@ -188,8 +188,8 @@ public class TestDistributedFileStoreCacheString
     {
         //SETUP
         _distributedCache.ClearAll();
-        _distributedCache.Set("XXX", "gone in a minute", null);
-        _distributedCache.Set("Still there", "keep this", null);
+        _distributedCache.Set("XXX", "gone in a minute");
+        _distributedCache.Set("Still there", "keep this");
 
         //ATTEMPT
         _distributedCache.Remove("XXX");
@@ -210,8 +210,8 @@ public class TestDistributedFileStoreCacheString
         _distributedCache.ClearAll();
 
         //ATTEMPT
-        _distributedCache.Set("test1", "first", null);
-        _distributedCache.Set("test2", "second", null);
+        _distributedCache.Set("test1", "first");
+        _distributedCache.Set("test2", "second");
 
         //VERIFY
         var allValues = _distributedCache.GetAllKeyValues();
@@ -232,7 +232,7 @@ public class TestDistributedFileStoreCacheString
         for (int i = 0; i < 10; i++)
         {
             _distributedCache.ClearAll();
-            _distributedCache.Set($"test{i}", i.ToString(), null);
+            _distributedCache.Set($"test{i}", i.ToString());
             _distributedCache.Get($"test{i}").ShouldEqual(i.ToString());
         }
 

@@ -25,7 +25,7 @@ public interface IDistributedFileStoreCacheString
     /// <param name="key">A string identifying the requested value.</param>
     /// <param name="value">The value to set in the cache.</param>
     /// <param name="options">The cache options for the value.</param>
-    void Set(string key, string value, DistributedCacheEntryOptions? options);
+    void Set(string key, string value, DistributedCacheEntryOptions? options = null);
 
     /// <summary>Sets the value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
@@ -33,7 +33,7 @@ public interface IDistributedFileStoreCacheString
     /// <param name="options">The cache options for the value.</param>
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
     /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation.</returns>
-    Task SetAsync(string key, string value, DistributedCacheEntryOptions? options,
+    Task SetAsync(string key, string value, DistributedCacheEntryOptions? options = null,
         CancellationToken token = new CancellationToken());
 
     /// <summary>Removes the value with the given key.</summary>
