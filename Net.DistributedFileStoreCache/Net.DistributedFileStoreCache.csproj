@@ -18,7 +18,7 @@
 
 	<PropertyGroup>
 		<PackageId>Net.DistributedFileStoreCache</PackageId>
-		<PackageVersion>1.0.0</PackageVersion>
+		<PackageVersion>1.0.0-preview999</PackageVersion>
 		<Authors>Jon P Smith</Authors>
 		<Description>A fast .NET distributed cache using a json file as the shared resource</Description>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
