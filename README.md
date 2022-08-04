@@ -5,9 +5,9 @@ This repo contains the Net.DistributedFileStoreCache library provides a .NET dis
 - It can get cache values blistering fast – it only takes ~25 ns. to Get one entry in a cache containing 10,000 entries.
 - It uses a json file as the shared resource which makes it really easy to setup, and you don't need to setup / pay for a database for your cache.
 
-The main downsides is its slower than the database-bases distributed cache libraries when updating the cache values.  See [Performance figures](#performance-figures) for more information.
+The main downsides is its slower than the database-bases distributed cache libraries when updating the cache values.  See [Performance figures](https://github.com/JonPSmith/Net.DistributedFileStoreCache#performance-figures) for more information.
 
-The Net.DistributedFileStoreCache is an open-source library under the MIT license  and the NuGet package (not ready yet!). The documentation can be found in the [GitHub wiki](https://github.com/JonPSmith/Net.DistributedFileStoreCache/wiki) and see the [ReleaseNotes.md](https://github.com/JonPSmith/Net.DistributedFileStoreCache/blob/main/ReleaseNotes.md) file for details of changes.
+The Net.DistributedFileStoreCache is an open-source library under the MIT license and a [NuGet package](https://www.nuget.org/package/Net.DistributedFileStoreCache/). The documentation can be found in the [GitHub wiki](https://github.com/JonPSmith/Net.DistributedFileStoreCache/wiki) and see the [ReleaseNotes.md](https://github.com/JonPSmith/Net.DistributedFileStoreCache/blob/main/ReleaseNotes.md) file for details of changes.
 
 ## Performance figures
 
