@@ -2,14 +2,10 @@
 // Licensed under MIT license. See License.txt in the project root for license information.
 
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using TestSupport.Attributes;
 using TestSupport.EfHelpers;
-using TestSupport.Helpers;
-using Xunit;
 using Xunit.Abstractions;
-using Xunit.Extensions.AssertExtensions;
 
 namespace Test.UnitTests;
 
@@ -41,22 +37,26 @@ public class TestSqlServerTiming
     }
 
 
-    //I build this to see how quick 
+
+    //I build this to see how quick a sql server cache could be
+    //Remember: a Set does an create or update, while the SQL only does create part
+    //That means that the SQL performance is better than a SQL cache library 
     [RunnableInDebugOnly]
-    public void TestReadFileWithShareNone()
+    public void TestSqlServerRaw()
     {
         //SETUP
         var options = this.CreateUniqueClassOptions<TestDbContext>();
         var context = new TestDbContext(options);
-        
+
         context.Database.EnsureClean();
 
         const int NumTest = 100;
         //warmup
         for (int i = 0; i < 10; i++)
         {
-            context.Add(new MyCache { Key = $"Key1{i:D4}", Value = DateTime.Now.Ticks.ToString() });
-            context.SaveChanges();
+            var insert = String.Format("INSERT INTO Cache ([Key], Value) VALUES ('{0}', '{1}')", $"Key1{i:D4}",
+                DateTime.Now.Ticks.ToString());
+            context.Database.ExecuteSqlRaw(insert);
         }
 
         //ATTEMPT
@@ -64,15 +64,13 @@ public class TestSqlServerTiming
         {
             for (int i = 0; i < NumTest; i++)
             {
-                context.Add(new MyCache { Key = $"Key2{i:D4}", Value = DateTime.Now.Ticks.ToString() });
-                context.SaveChanges();
-                context.ChangeTracker.Clear();
+                var insert = String.Format("INSERT INTO Cache ([Key], Value) VALUES ('{0}', '{1}')", $"Key2{i:D4}",
+                    DateTime.Now.Ticks.ToString());
+                context.Database.ExecuteSqlRaw(insert);
             }
         }
 
 
         //VERIFY
     }
-
-
 }
