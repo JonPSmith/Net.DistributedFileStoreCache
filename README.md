@@ -45,6 +45,8 @@ Summary of the read side is:
 |          GetKey |          10000 |    24.28 ns |    0.314 ns |  0.278 ns |
 | GetAllKeyValues |          10000 |    81.36 ns |    0.996 ns |  0.932 ns |
 
+NOTE: I tried a read of a SQL Server database containing 200 entries with Dapper and a single took about 300 us. 
+
 ### Write times
 
 Summary of the write side is:
@@ -62,3 +64,6 @@ are reading and then writing ALL the cache values into a file.
 |          AddKey |          10000 | 7,898.67 us | 172.10 us | 507.46 us |
 |     AddKeyAsync |          10000 | 8,922.15 us | 178.30 us | 307.57 us |
 
+NOTE: I tried a write of a SQL Server database containing 200 entries with Dapper and a single INSERT took about 1,000 us. 
+but but the real time would be longer because the SQL needs to see if a entry with the given key already exists, in 
+which case it would need to update the value of the existing entry.  

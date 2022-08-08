@@ -2,10 +2,12 @@
 // Licensed under MIT license. See License.txt in the project root for license information.
 
 using System.ComponentModel.DataAnnotations;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using TestSupport.Attributes;
 using TestSupport.EfHelpers;
 using Xunit.Abstractions;
+using Xunit.Extensions.AssertExtensions;
 
 namespace Test.UnitTests;
 
@@ -22,7 +24,8 @@ public class TestSqlServerTiming
     public class MyCache
     {
         [Key]
-        public string Key { get; set; }
+        [MaxLength(100)]
+        public string Name { get; set; }
         public string Value { get; set; }
     }
 
@@ -48,28 +51,40 @@ public class TestSqlServerTiming
         var options = this.CreateUniqueClassOptions<TestDbContext>();
         var context = new TestDbContext(options);
 
-        context.Database.EnsureClean();
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
 
         const int NumTest = 100;
         //warmup
         for (int i = 0; i < 10; i++)
         {
-            var insert = String.Format("INSERT INTO Cache ([Key], Value) VALUES ('{0}', '{1}')", $"Key1{i:D4}",
+            var insert = String.Format("INSERT INTO Cache (Name, Value) VALUES ('{0}', '{1}')", $"Key1{i:D4}",
                 DateTime.Now.Ticks.ToString());
             context.Database.ExecuteSqlRaw(insert);
         }
 
         //ATTEMPT
-        using (new TimeThings(_output, "sql", NumTest))
+        using (new TimeThings(_output, "sql write", NumTest))
         {
             for (int i = 0; i < NumTest; i++)
             {
-                var insert = String.Format("INSERT INTO Cache ([Key], Value) VALUES ('{0}', '{1}')", $"Key2{i:D4}",
+                var sql = String.Format("INSERT INTO Cache (Name, Value) VALUES ('{0}', '{1}')", $"Key2{i:D4}",
                     DateTime.Now.Ticks.ToString());
-                context.Database.ExecuteSqlRaw(insert);
+
+                context.Database.GetDbConnection().QuerySingleOrDefault<string>(sql);
             }
         }
 
+        string read = null;
+        using (new TimeThings(_output, "sql read", NumTest))
+        {
+            for (int i = 0; i < NumTest; i++)
+            {
+                var sql = $"SELECT [c].[Value] FROM [Cache] AS [c] WHERE [c].[Name] = 'Key2{i:D4}'";
+                read = context.Database.GetDbConnection().QuerySingleOrDefault<string>(sql);
+            }
+        }
+        read.ShouldNotBeNull();
 
         //VERIFY
     }
