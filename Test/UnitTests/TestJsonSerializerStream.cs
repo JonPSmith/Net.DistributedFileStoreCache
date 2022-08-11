@@ -11,9 +11,6 @@ namespace Test.UnitTests;
 
 //NOTE: I tried using streaming to improve performance, but it didn't make any change
 //I decided to NOT use streaming because you could add more data than the sync version can handle 
-
-// see https://stackoverflow.com/questions/1408175/execute-unit-tests-serially-rather-than-in-parallel
-[Collection("Sequential")]
 public class TestJsonSerializerStream
 {
     private readonly ITestOutputHelper _output;
