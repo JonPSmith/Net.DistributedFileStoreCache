@@ -6,6 +6,8 @@ This repo contains the Net.DistributedFileStoreCache library provides a .NET dis
    - It can also read ALL 10,000 cache entries in ~85 ns. too.
 - It uses a json file as the shared resource which makes it really easy to setup, and you don't need to setup / pay for a database for your cache.
 
+_NOTE: The shared resource is a json file and for it to work as a distributed cache all the application's instances must be able to access that file. This would work with Azure's Scale-Out feature with its default setup._
+
 The main downsides is its slower than the database-bases distributed cache libraries when updating the cache values.  See [Performance figures](https://github.com/JonPSmith/Net.DistributedFileStoreCache#performance-figures) for more information.
 
 The Net.DistributedFileStoreCache is an open-source library under the MIT license and a [NuGet package](https://www.nuget.org/packages/Net.DistributedFileStoreCache). The documentation can be found in the [GitHub wiki](https://github.com/JonPSmith/Net.DistributedFileStoreCache/wiki) and see the [ReleaseNotes.md](https://github.com/JonPSmith/Net.DistributedFileStoreCache/blob/main/ReleaseNotes.md) file for details of changes.
