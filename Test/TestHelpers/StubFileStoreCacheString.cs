@@ -4,7 +4,6 @@
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Caching.Distributed;
 using Net.DistributedFileStoreCache;
-using Net.DistributedFileStoreCache.SupportCode;
 
 namespace Test.TestHelpers;
 
@@ -17,7 +16,7 @@ public class StubFileStoreCacheString : IDistributedFileStoreCacheString
     /// <returns>The located value or null.</returns>
     public string? Get(string key)
     {
-        return StaticCachePart.CacheContent.Cache.TryGetValue(key, out string? value) ? value : null;
+        return _cache.TryGetValue(key, out string? value) ? value : null;
     }
 
     /// <summary>Gets a value with the given key.</summary>
@@ -26,7 +25,7 @@ public class StubFileStoreCacheString : IDistributedFileStoreCacheString
     /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous operation, containing the located value or null.</returns>
     public Task<string?> GetAsync(string key, CancellationToken token = new CancellationToken())
     {
-        return Task.FromResult(StaticCachePart.CacheContent.Cache.TryGetValue(key, out string? value) ? value : null);
+        return Task.FromResult(_cache.TryGetValue(key, out string? value) ? value : null);
     }
 
     /// <summary>Sets a value with the given key.</summary>
