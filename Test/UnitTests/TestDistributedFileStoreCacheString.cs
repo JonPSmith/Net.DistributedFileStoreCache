@@ -55,6 +55,29 @@ public class TestDistributedFileStoreCacheString
     }
 
     [Fact]
+    public void DistributedFileStoreClearAllWithEntries()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+        _distributedCache.Set("old", "entry");
+
+        //ATTEMPT
+        _distributedCache.ClearAll((new List<KeyValuePair<string, string>>
+        {
+            new ("test1", "first"),
+            new ("test2", "second")
+        }));
+
+        //VERIFY
+        var allValues = _distributedCache.GetAllKeyValues();
+        allValues.Count.ShouldEqual(2);
+        allValues["test1"].ShouldEqual("first");
+        allValues["test2"].ShouldEqual("second");
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
     public void DistributedFileStoreCacheSet()
     {
         //SETUP
@@ -151,7 +174,7 @@ public class TestDistributedFileStoreCacheString
         {
             _distributedCache.Set("test", null);
         }
-        catch (NullReferenceException)
+        catch (ArgumentNullException)
         {
             return;
         }
@@ -216,6 +239,51 @@ public class TestDistributedFileStoreCacheString
         allValues.Count.ShouldEqual(2);
         allValues["test1"].ShouldEqual("first");
         allValues["test2"].ShouldEqual("second");
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSetMany()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        _distributedCache.SetMany(new List<KeyValuePair<string, string>>
+        {
+            new ("test1", "first"),
+            new ("test2", "second")
+        });
+
+        //VERIFY
+        var allValues = _distributedCache.GetAllKeyValues();
+        allValues.Count.ShouldEqual(2);
+        allValues["test1"].ShouldEqual("first");
+        allValues["test2"].ShouldEqual("second");
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public void DistributedFileStoreCacheSetMany_AbsoluteExpirationRelativeToNow()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        _distributedCache.SetMany(new List<KeyValuePair<string, string>>
+        {
+            new ("Timeout1", "first"),
+            new ("Timeout2", "second")
+        }, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromTicks(1) });
+        _distributedCache.Set("NotTimedOut", "I'm still here");
+
+        //VERIFY
+        var allValues = _distributedCache.GetAllKeyValues();
+        allValues.Count.ShouldEqual(1);
+        allValues["NotTimedOut"].ShouldEqual("I'm still here");
+        StaticCachePart.CacheContent.TimeOuts.ContainsKey("Timeout1").ShouldBeFalse();
 
         _options.DisplayCacheFile(_output);
     }

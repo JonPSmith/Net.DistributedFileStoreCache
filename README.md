@@ -56,14 +56,19 @@ Summary of the write side is:
 - The time taken to add a cache value to cache goes up as the size of the cache is. This makes sense as unlike a database you 
 are reading and then writing ALL the cache values into a file.
 - The async versions are slower than the sync versions, but it does release a thread while reading and writing.
+- The SetMany method takes about the same time as a single Set (see AddManyKey100), 
+so use this if you have many entries to add to the cache at the same time.
 
 |          Method | NumKeysAtStart |        Mean |     Error |    StdDev |
 |---------------- |--------------- |------------:|----------:|----------:|
 |          AddKey |            100 | 1,302.69 us |   9.85 us |   9.21 us |
+|   AddManyKey100 |            100 | 1,370.46 us |  25.05 us |  23.43 us |       
 |     AddKeyAsync |            100 | 1,664.47 us |  32.51 us |  34.79 us |
 |          AddKey |           1000 | 1,673.28 us |  25.60 us |  23.95 us |
+|   AddManyKey100 |           1000 | 1,703.97 us |  32.31 us |  30.22 us |
 |     AddKeyAsync |           1000 | 2,267.81 us |  45.10 us |  42.18 us |
 |          AddKey |          10000 | 7,898.67 us | 172.10 us | 507.46 us |
+|   AddManyKey100 |          10000 | 8,355.18 us | 166.22 us | 368.35 us |
 |     AddKeyAsync |          10000 | 8,922.15 us | 178.30 us | 307.57 us |
 
 NOTE: I tried a write of a SQL Server database containing 200 entries with Dapper and a single INSERT took about 1,000 us. 

@@ -84,8 +84,9 @@ public class CacheFileHandler
     /// <param name="entryOptions"></param>
     public void SetKeyValue(string key, string value, DistributedCacheEntryOptions? entryOptions)
     {
+        var setter = new CacheFileSetOne(key, value, entryOptions);
         _options.TryAgainOnUnauthorizedAccess(() =>
-            ReadAndChangeCacheJsonFile(CacheChanges.Add, false, key, value, entryOptions)
+            ReadAndChangeCacheJsonFile(setter.SetKeyValueHandler, false)
                 .CheckSyncValueTaskWorked());
     }
 
@@ -100,8 +101,37 @@ public class CacheFileHandler
     public async Task SetKeyValueAsync(string key, string value, DistributedCacheEntryOptions? entryOptions,
         CancellationToken token)
     {
+        var setter = new CacheFileSetOne(key, value, entryOptions);
         await _options.TryAgainOnUnauthorizedAccessAsync(async () =>
-            await ReadAndChangeCacheJsonFile(CacheChanges.Add, true, key, value, entryOptions, token));
+            await ReadAndChangeCacheJsonFile(setter.SetKeyValueHandler, true, token: token));
+    }
+
+    /// <summary>
+    /// This handles the SetMany
+    /// </summary>
+    /// <param name="manyEntries"></param>
+    /// <param name="entryOptions"></param>
+    public void SetKeyValueMany(List<KeyValuePair<string, string>> manyEntries, DistributedCacheEntryOptions? entryOptions)
+    {
+        var setMany = new CacheFileSetMany(manyEntries, entryOptions);
+        _options.TryAgainOnUnauthorizedAccess(() =>
+            ReadAndChangeCacheJsonFile(setMany.SetManyKeyValueHandler, false)
+                .CheckSyncValueTaskWorked());
+    }
+
+    /// <summary>
+    /// This handles the SetManyAsync
+    /// </summary>
+    /// <param name="manyEntries"></param>
+    /// <param name="entryOptions"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public async Task SetKeyValueManyAsync(List<KeyValuePair<string, string>> manyEntries, DistributedCacheEntryOptions? entryOptions,
+        CancellationToken token)
+    {
+        var setMany = new CacheFileSetMany(manyEntries, entryOptions);
+        await _options.TryAgainOnUnauthorizedAccessAsync(async () =>
+            await ReadAndChangeCacheJsonFile(setMany.SetManyKeyValueHandler, true, token: token));
     }
 
     /// <summary>
@@ -110,10 +140,12 @@ public class CacheFileHandler
     /// <param name="key"></param>
     public void RemoveKeyValue(string key)
     {
+        var remover = new CacheFileRemove(key);
         _options.TryAgainOnUnauthorizedAccess(() =>
-            ReadAndChangeCacheJsonFile(CacheChanges.Remove, false, key)
+            ReadAndChangeCacheJsonFile(remover.RemoveKeyValueHandler, false)
                 .CheckSyncValueTaskWorked());
     }
+
 
     /// <summary>
     /// This handles the RemoveAsync
@@ -123,17 +155,21 @@ public class CacheFileHandler
     /// <returns></returns>
     public async Task RemoveKeyValueAsync(string key, CancellationToken token)
     {
+        var remover = new CacheFileRemove(key);
         await _options.TryAgainOnUnauthorizedAccessAsync(async () =>
-            await ReadAndChangeCacheJsonFile(CacheChanges.Remove, false, key, token: token));
+            await ReadAndChangeCacheJsonFile(remover.RemoveKeyValueHandler, false, token: token));
     }
 
     /// <summary>
     /// This handles the ClearAll
     /// </summary>
-    public void ResetCacheFile()
+    /// <param name="manyEntries">if not null, then after of the clearing the cache these KeyValues will written into the cache</param>
+    /// <param name="entryOptions">Optional: If there are entries to add to the cache, this will set the timeout time.</param>
+    public void ResetCacheFile(List<KeyValuePair<string, string>>? manyEntries, DistributedCacheEntryOptions? entryOptions)
     {
+        var setMany = new CacheFileSetMany(manyEntries, entryOptions);
         _options.TryAgainOnUnauthorizedAccess(() =>
-            ReadAndChangeCacheJsonFile(CacheChanges.Reset, false).CheckSyncValueTaskWorked());
+            ReadAndChangeCacheJsonFile(setMany.SetManyKeyValueHandler , false, true).CheckSyncValueTaskWorked());
     }
 
 
@@ -200,11 +236,10 @@ public class CacheFileHandler
             StaticCachePart.UpdateLocalCache(GetJsonFromByteBuffer(numBytesRead, ref readBuffer));
         }
     }
-    private enum CacheChanges { Add, Remove, Reset }
+    public delegate void UpdateJsonDelegate(ref CacheJsonContent updateCurrentJson);
 
-    private async ValueTask ReadAndChangeCacheJsonFile(CacheChanges whatToDo, bool useAsync,
-        string? key = null, string? value = null, DistributedCacheEntryOptions? entryOptions = null,
-        CancellationToken token = new CancellationToken())
+    private async ValueTask ReadAndChangeCacheJsonFile(UpdateJsonDelegate? updateCurrentJson, bool useAsync, 
+        bool reset = false, CancellationToken token = new ())
     {
         //thanks to https://stackoverflow.com/questions/15628902/lock-file-exclusively-then-delete-move-it for this approach
 
@@ -213,7 +248,7 @@ public class CacheFileHandler
         var filePath = _options.FormCacheFilePath();
         using FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, bufferSize: 1, useAsync);
         {
-            if(whatToDo != CacheChanges.Reset)
+            if(!reset)
             {
                 numBytesRead = useAsync 
                     ? await fileStream.ReadAsync(readWriteBuffer, token)
@@ -224,28 +259,8 @@ public class CacheFileHandler
                         $"bytes, so you MUST set the option's {nameof(DistributedFileStoreCacheOptions.MaxBytesInJsonCacheFile)} to a bigger value.");
             }
 
-            CacheJsonContent json;
-            switch (whatToDo)
-            {
-                case CacheChanges.Add:
-                    if (key == null) throw new NullReferenceException("The key cannot be null");
-                    if (value == null) throw new NullReferenceException("The value cannot be null");
-                    json = GetJsonFromByteBuffer(numBytesRead, ref readWriteBuffer);
-                    json.Cache[key] = value;
-                    json.SetupTimeoutIfOptions(key, entryOptions);
-                    break;
-                case CacheChanges.Remove:
-                    if (key == null) throw new NullReferenceException("The key cannot be null");
-                    json = GetJsonFromByteBuffer(numBytesRead, ref readWriteBuffer);
-                    json.Cache.Remove(key);
-                    json.TimeOuts.Remove(key);
-                    break;
-                case CacheChanges.Reset:
-                    json = new CacheJsonContent();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(whatToDo), whatToDo, null);
-            }
+            var json = reset ? new CacheJsonContent() : GetJsonFromByteBuffer(numBytesRead, ref readWriteBuffer);
+            updateCurrentJson?.Invoke(ref json);
 
             var bytesToWrite = FillByteBufferWithCacheJsonData(json);
             if (bytesToWrite.Length < _options.MaxBytesInJsonCacheFile)

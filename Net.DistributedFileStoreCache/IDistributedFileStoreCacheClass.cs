@@ -2,6 +2,7 @@
 // Licensed under MIT license. See License.txt in the project root for license information.
 
 using Microsoft.Extensions.Caching.Distributed;
+using Net.DistributedFileStoreCache.SupportCode;
 
 namespace Net.DistributedFileStoreCache;
 
@@ -36,7 +37,7 @@ public interface IDistributedFileStoreCacheClass : IDistributedFileStoreCacheStr
     /// <param name="key">A string identifying the requested value.</param>
     /// <param name="yourClass">The class that you wanted to be stored in the cache.</param>
     /// <param name="options">The cache options for the value.</param>
-    /// <typeparam name="T">A class which can be created</typeparam>
+    /// <typeparam name="T">A class which contains the data to stored as JSON in the cache</typeparam>
     void SetClass<T>(string key, T yourClass, DistributedCacheEntryOptions? options = null) where T : class, new();
 
     /// <summary>Serializers the class and stores the json against the given key.</summary>
@@ -44,7 +45,23 @@ public interface IDistributedFileStoreCacheClass : IDistributedFileStoreCacheStr
     /// <param name="yourClass">The class that you wanted to be stored in the cache.</param>
     /// <param name="options">The cache options for the value.</param>
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
-    /// <typeparam name="T">A class which can be created</typeparam>
+    /// <typeparam name="T">A class which contains the data to stored as JSON in the cache</typeparam>
     Task SetClassAsync<T>(string key, T yourClass, DistributedCacheEntryOptions? options = null,
         CancellationToken token = new CancellationToken()) where T : class, new();
+
+    /// <summary>Serializes all the values in each KeyValue using the T type and save each into the cache</summary>
+    /// <param name="manyEntries">List of KeyValuePairs to be added to the cache, with the values being serialized.</param>
+    /// <param name="options">Optional: The cache options for the value.</param>
+    /// <typeparam name="T">A class which contains the data to stored as JSON in the cache</typeparam>
+    void SetManyClass<T>(List<KeyValuePair<string, T>> manyEntries, DistributedCacheEntryOptions? options = null)
+        where T : class, new();
+
+    /// <summary>Serializes all the values in each KeyValue using the T type and save each into the cache</summary>
+    /// <param name="manyEntries">List of KeyValuePairs to be added to the cache, with the values being serialized.</param>
+    /// <param name="options">Optional: The cache options for the value.</param>
+    /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
+    /// <typeparam name="T">A class which contains the data to stored as JSON in the cache</typeparam>
+    Task SetManyClassAsync<T>(List<KeyValuePair<string, T>> manyEntries, DistributedCacheEntryOptions? options = null,
+        CancellationToken token = new()) where T : class, new();
+
 }

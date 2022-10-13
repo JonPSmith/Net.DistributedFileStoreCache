@@ -15,7 +15,7 @@ internal static class ExpirationExtensions
     /// <param name="key"></param>
     /// <param name="entryOptions"></param>
     /// <exception cref="NotImplementedException"></exception>
-    public static void SetupTimeoutIfOptions(this CacheJsonContent cache, string key, DistributedCacheEntryOptions? entryOptions)
+    public static void SetupTimeoutIfOptions(ref CacheJsonContent cache, string key, DistributedCacheEntryOptions? entryOptions)
     {
         if (entryOptions == null)
             return;

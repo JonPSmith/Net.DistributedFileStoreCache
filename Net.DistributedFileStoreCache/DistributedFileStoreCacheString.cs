@@ -64,6 +64,25 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
         return CacheFileHandler.SetKeyValueAsync(key, value, options, token);
     }
 
+    /// <summary>Sets many entries via a list of KeyValues</summary>
+    /// <param name="manyEntries">List of KeyValuePairs to be added to the cache.</param>
+    /// <param name="options">Optional: The cache options for the value.</param>
+    public void SetMany(List<KeyValuePair<string, string>> manyEntries, DistributedCacheEntryOptions? options)
+    {
+        CacheFileHandler.SetKeyValueMany(manyEntries, options);
+    }
+
+
+    /// <summary>Sets many entries via a list of KeyValues</summary>
+    /// <param name="manyEntries">List of KeyValuePairs to be added to the cache.</param>
+    /// <param name="options">Optional: The cache options for the value.</param>
+    /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
+    public Task SetManyAsync(List<KeyValuePair<string, string>> manyEntries, DistributedCacheEntryOptions? options,
+        CancellationToken token = new ())
+    {
+        return CacheFileHandler.SetKeyValueManyAsync(manyEntries, options, token);
+    }
+
     /// <summary>Removes the value with the given key.</summary>
     /// <param name="key">A string identifying the requested value.</param>
     public void Remove(string key)
@@ -81,11 +100,13 @@ public class DistributedFileStoreCacheString : IDistributedFileStoreCacheString
     }
 
     /// <summary>
-    /// This clears all the key/value pairs from the json cache file
+    /// This clears all the key/value pairs from the json cache file, with option to add entries after the cache is cleared.
     /// </summary>
-    public void ClearAll()
+    /// <param name="manyEntries">Optional: After of the clearing the cache these KeyValues will written into the cache</param>
+    /// <param name="entryOptions">Optional: If there are entries to add to the cache, this will set the timeout time.</param>
+    public void ClearAll(List<KeyValuePair<string, string>>? manyEntries = null, DistributedCacheEntryOptions? entryOptions = null)
     {
-        CacheFileHandler.ResetCacheFile();
+        CacheFileHandler.ResetCacheFile(manyEntries, entryOptions);
     }
 
     /// <summary>

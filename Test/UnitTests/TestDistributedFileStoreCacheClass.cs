@@ -181,4 +181,26 @@ public class TestDistributedFileStoreCacheClass
         //Example if no UnsafeRelaxedJsonEscaping
         //"{\u0022MyClass1\u0022:{\u0022MyInt\u0022:1,\u0022MyString\u0022:\u0022Hello\u0022},\u0022MyInt\u0022:3}"}
     }
+
+    [Fact]
+    public void DistributedFileStoreCacheSetManyClass_JsonClass2()
+    {
+        //SETUP
+        _fsCache.ClearAll();
+
+        //ATTEMPT
+        _fsCache.SetManyClass(new List<KeyValuePair<string, JsonClass1>>
+        {
+            new("test1", new JsonClass1 { MyInt = 1, MyString = "Hello" }),
+            new("test2", new JsonClass1 { MyInt = 2, MyString = "Goodbye" })
+        });
+
+        //VERIFY
+        var allValues = _fsCache.GetAllKeyValues();
+        allValues.Count.ShouldEqual(2);
+        allValues["test1"].ShouldEqual("{\"MyInt\":1,\"MyString\":\"Hello\"}");
+        allValues["test2"].ShouldEqual("{\"MyInt\":2,\"MyString\":\"Goodbye\"}");
+
+        _options.DisplayCacheFile(_output);
+    }
 }

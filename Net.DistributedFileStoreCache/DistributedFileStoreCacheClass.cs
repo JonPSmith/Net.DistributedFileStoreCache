@@ -75,9 +75,38 @@ public class DistributedFileStoreCacheClass : DistributedFileStoreCacheString, I
     /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
     /// <typeparam name="T">A class which can be created</typeparam>
     public Task SetClassAsync<T>(string key, T yourClass, DistributedCacheEntryOptions? options,
-        CancellationToken token = new CancellationToken()) where T : class, new()
+        CancellationToken token = new ()) where T : class, new()
     {
         var jsonString = JsonSerializer.Serialize(yourClass, _options.JsonSerializerForCacheFile);
         return CacheFileHandler.SetKeyValueAsync(key, jsonString, options, token);
+    }
+
+    /// <summary>Serializes all the values in each KeyValue using the T type and save each into the cache</summary>
+    /// <param name="manyEntries">List of KeyValuePairs to be added to the cache, with the values being serialized.</param>
+    /// <param name="options">Optional: The cache options for the value.</param>
+    /// <typeparam name="T">A class which contains the data to stored as JSON in the cache</typeparam>
+    public void SetManyClass<T>(List<KeyValuePair<string, T>> manyEntries, DistributedCacheEntryOptions? options)
+        where T : class, new()
+    {
+        var keysWithJsonValues = manyEntries
+            .Select(m => new KeyValuePair<string, string>(
+                m.Key, JsonSerializer.Serialize(m.Value, _options.JsonSerializerForCacheFile)))
+            .ToList();
+        CacheFileHandler.SetKeyValueMany(keysWithJsonValues, options);
+    }
+
+    /// <summary>Serializes all the values in each KeyValue using the T type and save each into the cache</summary>
+    /// <param name="manyEntries">List of KeyValuePairs to be added to the cache, with the values being serialized.</param>
+    /// <param name="options">Optional: The cache options for the value.</param>
+    /// <param name="token">Optional. The <see cref="T:System.Threading.CancellationToken" /> used to propagate notifications that the operation should be canceled.</param>
+    /// <typeparam name="T">A class which contains the data to stored as JSON in the cache</typeparam>
+    public Task SetManyClassAsync<T>(List<KeyValuePair<string, T>> manyEntries, DistributedCacheEntryOptions? options, 
+        CancellationToken token = new()) where T : class, new()
+    {
+        var keysWithJsonValues = manyEntries
+            .Select(m => new KeyValuePair<string, string>(
+                m.Key, JsonSerializer.Serialize(m.Value, _options.JsonSerializerForCacheFile)))
+            .ToList();
+        return CacheFileHandler.SetKeyValueManyAsync(keysWithJsonValues, options, token);
     }
 }

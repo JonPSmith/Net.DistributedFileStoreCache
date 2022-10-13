@@ -114,7 +114,7 @@ public class TestDistributedFileStoreCacheString_Async
         {
             await _distributedCache.SetAsync("test", null);
         }
-        catch (NullReferenceException)
+        catch (ArgumentNullException)
         {
             return;
         }
@@ -167,14 +167,62 @@ public class TestDistributedFileStoreCacheString_Async
         _distributedCache.ClearAll();
 
         //ATTEMPT
-        await _distributedCache.SetAsync("test1", "first");
-        await _distributedCache.SetAsync("test2", "second");
+        await _distributedCache.SetManyAsync(new List<KeyValuePair<string, string>>
+        {
+            new ("test1", "first"),
+            new ("test2", "second")
+        });
 
         //VERIFY
         var allValues = await _distributedCache.GetAllKeyValuesAsync();
         allValues.Count.ShouldEqual(2);
         allValues["test1"].ShouldEqual("first");
         allValues["test2"].ShouldEqual("second");
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public async Task DistributedFileStoreCacheSetMany()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        await _distributedCache.SetManyAsync(new List<KeyValuePair<string, string>>
+        {
+            new ("test1", "first"),
+            new ("test2", "second")
+        });
+
+        //VERIFY
+        var allValues = await _distributedCache.GetAllKeyValuesAsync();
+        allValues.Count.ShouldEqual(2);
+        allValues["test1"].ShouldEqual("first");
+        allValues["test2"].ShouldEqual("second");
+
+        _options.DisplayCacheFile(_output);
+    }
+
+    [Fact]
+    public async Task DistributedFileStoreCacheSetMany_AbsoluteExpirationRelativeToNow()
+    {
+        //SETUP
+        _distributedCache.ClearAll();
+
+        //ATTEMPT
+        await _distributedCache.SetManyAsync(new List<KeyValuePair<string, string>>
+        {
+            new ("Timeout1", "first"),
+            new ("Timeout2", "second")
+        }, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromTicks(1) });
+        await _distributedCache.SetAsync("NotTimedOut", "I'm still here");
+
+        //VERIFY
+        var allValues = await _distributedCache.GetAllKeyValuesAsync();
+        allValues.Count.ShouldEqual(1);
+        allValues["NotTimedOut"].ShouldEqual("I'm still here");
+        StaticCachePart.CacheContent.TimeOuts.ContainsKey("Timeout1").ShouldBeFalse();
 
         _options.DisplayCacheFile(_output);
     }

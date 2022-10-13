@@ -18,12 +18,14 @@
 
 	<PropertyGroup>
 		<PackageId>Net.DistributedFileStoreCache</PackageId>
-		<PackageVersion>1.0.0-preview999</PackageVersion>
+		<PackageVersion>1.1.0</PackageVersion>
 		<Authors>Jon P Smith</Authors>
 		<Description>A fast .NET distributed cache using a json file as the shared resource</Description>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes>
-			First release
+- New Feature: SetMany / SetManyAsync now allows you to many entries in one go. This can add many entries as quickly as a single Set call.
+- New Feature: SetManyClass / SetManyClassAsync now allows you to many entries in one go. This can add many entries as quickly as a single SetClass call.
+- New Feature: ClearAll now has an option to add a list of key/value pairs into the json cache file after the cache is cleared
 		</PackageReleaseNotes>
 		<Copyright>Copyright (c) 2022 Jon P Smith. Licenced under MIT licence</Copyright>
 		<PackageTags>Distributed cache</PackageTags>

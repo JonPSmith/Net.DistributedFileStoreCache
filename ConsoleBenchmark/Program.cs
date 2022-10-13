@@ -32,17 +32,31 @@ public class ConsoleBenchmark
     [GlobalSetup]
     public void GlobalSetup()
     {
-        _distributedCache.ClearAll();
+        var allKeyValues = new List<KeyValuePair<string,string>>();
         for (int i = 0; i < NumKeysAtStart; i++)
         {
-            _distributedCache.Set($"Key{i:D4}", DateTime.UtcNow.ToString("O"), null);
+            allKeyValues.Add(new KeyValuePair<string, string>($"Key{i:D4}", DateTime.UtcNow.ToString("O")));
         }
+        _distributedCache.ClearAll(allKeyValues);
     }
 
     [Benchmark]
     public void AddKey()
     {
         _distributedCache.Set("NewKey", DateTime.UtcNow.ToString("O"), null);
+        _distributedCache.Get("NewKey"); //This forces an read
+    }
+
+    [Benchmark]
+    public void AddManyKey100()
+    {
+        var allKeyValues = new List<KeyValuePair<string, string>>();
+        for (int i = 0; i < 100; i++)
+        {
+            allKeyValues.Add(new KeyValuePair<string, string>($"NewKey{i:D4}", DateTime.UtcNow.ToString("O")));
+        }
+
+        _distributedCache.SetMany(allKeyValues);
         _distributedCache.Get("NewKey"); //This forces an read
     }
 
