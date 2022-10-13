@@ -56,7 +56,7 @@ Summary of the write side is:
 - The time taken to add a cache value to cache goes up as the size of the cache is. This makes sense as unlike a database you 
 are reading and then writing ALL the cache values into a file.
 - The async versions are slower than the sync versions, but it does release a thread while reading and writing.
-- The SetMany method takes about the same time as a single Set (see AddManyKey100), 
+- The SetMany method takes about the same time as a single Set (see AddManyKey100 which adds 100 new entries), 
 so use this if you have many entries to add to the cache at the same time.
 
 |          Method | NumKeysAtStart |        Mean |     Error |    StdDev |
