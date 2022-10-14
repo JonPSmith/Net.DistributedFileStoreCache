@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -18,7 +18,7 @@
 
 	<PropertyGroup>
 		<PackageId>Net.DistributedFileStoreCache</PackageId>
-		<PackageVersion>1.1.0</PackageVersion>
+		<PackageVersion>1.2.0-preview001</PackageVersion>
 		<Authors>Jon P Smith</Authors>
 		<Description>A fast .NET distributed cache using a json file as the shared resource</Description>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
