@@ -236,6 +236,11 @@ public class CacheFileHandler
             StaticCachePart.UpdateLocalCache(GetJsonFromByteBuffer(numBytesRead, ref readBuffer));
         }
     }
+
+    /// <summary>
+    /// delegate to use in methods
+    /// </summary>
+    /// <param name="updateCurrentJson"></param>
     public delegate void UpdateJsonDelegate(ref CacheJsonContent updateCurrentJson);
 
     private async ValueTask ReadAndChangeCacheJsonFile(UpdateJsonDelegate? updateCurrentJson, bool useAsync, 

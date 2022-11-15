@@ -38,29 +38,29 @@ internal static class ValueTaskSyncCheckers
         return valueTask.GetAwaiter().GetResult();
     }
 
-    public static TResult CheckSyncValueTaskWorkedDynamicAndReturnResult<TResult>(dynamic dynamicValueType)
-    {
-        try
-        {
-            var runner = Activator.CreateInstance(typeof(GenericValueTypeChecker<TResult>),
-                dynamicValueType);
-            return ((GenericValueTypeChecker<TResult>)runner).Result;
-        }
-        catch (Exception e)
-        {
-            ExceptionDispatchInfo.Capture(e?.InnerException ?? e).Throw();
-        }
+    //public static TResult CheckSyncValueTaskWorkedDynamicAndReturnResult<TResult>(dynamic dynamicValueType)
+    //{
+    //    try
+    //    {
+    //        var runner = Activator.CreateInstance(typeof(GenericValueTypeChecker<TResult>),
+    //            dynamicValueType);
+    //        return ((GenericValueTypeChecker<TResult>)runner).Result;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        ExceptionDispatchInfo.Capture(e?.InnerException ?? e).Throw();
+    //    }
 
-        return default;
-    }
+    //    return default;
+    //}
 
-    private class GenericValueTypeChecker<TResult>
-    {
-        public GenericValueTypeChecker(dynamic valueTask)
-        {
-            Result = CheckSyncValueTaskWorkedAndReturnResult(((ValueTask<TResult>)valueTask));
-        }
+    //private class GenericValueTypeChecker<TResult>
+    //{
+    //    public GenericValueTypeChecker(dynamic valueTask)
+    //    {
+    //        Result = CheckSyncValueTaskWorkedAndReturnResult(((ValueTask<TResult>)valueTask));
+    //    }
 
-        public TResult Result { get; }
-    }
+    //    public TResult Result { get; }
+    //}
 }
