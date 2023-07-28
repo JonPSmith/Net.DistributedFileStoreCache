@@ -39,14 +39,17 @@ public class DistributedFileStoreCacheOptions
     /// <summary>
     /// This defines which version of the <see cref="DistributedFileStoreCacheBytes"/> services are registered
     /// 1. Default is <see cref="IDistributedFileStoreCacheString"/>, where the value is of type string, plus two extra features
-    /// 2. If set to <see cref="IDistributedFileStoreCacheBytes"/>, where the value is of type byte[], plus two extra features
-    /// 3. If set to <see cref="FileStoreCacheVersions.IDistributedCache"/>, which implements the <see cref="IDistributedCache"/> interface
+    /// 2. If set to <see cref="DistributedFileStoreCacheClass"/> this handles classes and strings.
+    /// 3. If set to <see cref="IDistributedFileStoreCacheBytes"/>, where the value is of type byte[], plus two extra features
+    /// 4. If set to <see cref="FileStoreCacheVersions.IDistributedCache"/>, which implements the <see cref="IDistributedCache"/> interface
     /// </summary>
     public FileStoreCacheVersions WhichVersion { get; set; }
 
     /// <summary>
     /// This defines the maximum bytes that can be in the cache json file.
-    /// If you exceed this, then you will have an exception, so I recommend you think .
+    /// If you exceed this, then you will have an exception, so I recommend you use the
+    /// <see cref="SetMaxBytesByCalculation"/> to get the correct size.
+    /// See https://github.com/JonPSmith/Net.DistributedFileStoreCache/wiki/Tips-on-making-your-cache-fast
     /// </summary>
     public int MaxBytesInJsonCacheFile { get; set; } = 10_000;
 
@@ -54,10 +57,11 @@ public class DistributedFileStoreCacheOptions
     /// If you want to set the maximum bytes that the cache can hold then you can use this calculation
     /// </summary>
     /// <param name="maxEntries">The maximum number of cache entries you want to add to the cache</param>
-    /// <param name="maxKeyLength">The maximum size of the key string. ASSUMES ASCII characters - increase if Unicode</param>
+    /// <param name="maxKeyLength">The maximum size of the key string. ASSUMES ASCII characters.
+    /// Use the <see cref="charSize"/> parameter to define what type of data you are caching.</param>
     /// <param name="maxValueLength">The maximum size of the value string</param>
     /// <param name="charSize">Optional:
-    /// If ascii = 1, if unicode and not using UnsafeRelaxedJsonEscaping then 6, 
+    /// If ascii data = 1, if unicode and not using UnsafeRelaxedJsonEscaping then 6, 
     /// if unicode with UnsafeRelaxedJsonEscaping then 2,
     /// if not UTF8 character the 6</param>
     /// <param name="percentWithTimeout">Optional: the percent (between 0 and 100) of the entries will have a timeout</param>
