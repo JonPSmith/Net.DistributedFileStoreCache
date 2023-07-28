@@ -39,7 +39,7 @@ public class DistributedFileStoreCacheOptions
     /// <summary>
     /// This defines which version of the <see cref="DistributedFileStoreCacheBytes"/> services are registered
     /// 1. Default is <see cref="IDistributedFileStoreCacheString"/>, where the value is of type string, plus two extra features
-    /// 2. If set to <see cref="DistributedFileStoreCacheClass"/> this handles classes and strings.
+    /// 2. If set to <see cref="DistributedFileStoreCacheClass"/> this handles classes and type string, plus two extra features
     /// 3. If set to <see cref="IDistributedFileStoreCacheBytes"/>, where the value is of type byte[], plus two extra features
     /// 4. If set to <see cref="FileStoreCacheVersions.IDistributedCache"/>, which implements the <see cref="IDistributedCache"/> interface
     /// </summary>
