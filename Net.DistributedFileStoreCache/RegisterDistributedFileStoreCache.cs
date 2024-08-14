@@ -47,12 +47,12 @@ public static class RegisterDistributedFileStoreCache
 
         if (options.PathToCacheFileDirectory == null)
             throw new DistributedFileStoreCacheException(
-                $"You either need to provide an value for the {nameof(environment)} parameter, " +
+                $"You either need to provide a value for the {nameof(environment)} parameter, " +
                 $"or set the options' {nameof(DistributedFileStoreCacheOptions.PathToCacheFileDirectory)} property.");
 
         if (options.SecondPartOfCacheFileName == null)
             throw new DistributedFileStoreCacheException(
-                $"You either need to provide an value for the {nameof(environment)} parameter, " +
+                $"You either need to provide a value for the {nameof(environment)} parameter, " +
                 $"or set the options' {nameof(DistributedFileStoreCacheOptions.SecondPartOfCacheFileName)} property.");
 
         //Set up the static file watcher
